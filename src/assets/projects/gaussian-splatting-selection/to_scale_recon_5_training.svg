@@ -1,0 +1,109 @@
+<svg width="1000" height="640" viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" font-family="Poppins, sans-serif">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&amp;display=swap');
+    text { font-family: 'Poppins', sans-serif; fill: #000; }
+    .title { font-size: 24px; font-weight: 600; }
+    .subtitle { font-size: 14px; font-weight: 300; fill: #555; font-style: italic; }
+    .section-label { font-size: 11px; font-weight: 500; fill: #666; letter-spacing: 1.5px; }
+    .section-title { font-size: 16px; font-weight: 600; }
+    .body { font-size: 12px; font-weight: 300; fill: #333; }
+    .body-mid { font-size: 12px; font-weight: 400; fill: #222; }
+    .tool-name { font-size: 13px; font-weight: 500; text-anchor: middle; }
+    .tool-desc { font-size: 10px; font-weight: 300; fill: #666; text-anchor: middle; }
+    .feature-title { font-size: 12px; font-weight: 500; }
+    .feature-desc { font-size: 11px; font-weight: 300; fill: #444; }
+    .choice-label { font-size: 11px; font-weight: 500; fill: #fff; }
+    .box { fill: #fff; stroke: #000; stroke-width: 1.2; }
+    .tool-box { fill: #fff; stroke: #000; stroke-width: 0.8; }
+    .tool-box-highlight { fill: #fff; stroke: #000; stroke-width: 2; }
+    .choice-pill { fill: #000; stroke: #000; }
+    .divider { stroke: #000; stroke-width: 0.5; opacity: 0.3; }
+  </style>
+
+  <text x="40" y="44" class="title">Training — Gaussian Splatting tool selection</text>
+  <text x="40" y="66" class="subtitle">Open-source vs. commercial options, and why this project uses LichtFeld.</text>
+
+  <!-- Open source row -->
+  <rect x="40" y="100" width="920" height="155" class="box" rx="6"/>
+  <text x="60" y="125" class="section-label">OPEN SOURCE</text>
+  <text x="60" y="150" class="body" font-style="italic">Modifiable, scriptable, research-oriented. Require own compute.</text>
+
+  <!-- gsplat -->
+  <rect x="60" y="170" width="205" height="70" class="tool-box" rx="4"/>
+  <text x="162" y="196" class="tool-name">gsplat</text>
+  <text x="162" y="216" class="tool-desc">Nerfstudio team</text>
+  <text x="162" y="230" class="tool-desc">CUDA-optimized rasterizer</text>
+
+  <!-- nerfstudio -->
+  <rect x="285" y="170" width="205" height="70" class="tool-box" rx="4"/>
+  <text x="387" y="196" class="tool-name">nerfstudio</text>
+  <text x="387" y="216" class="tool-desc">Framework with splatfacto</text>
+  <text x="387" y="230" class="tool-desc">Broad NeRF + GS support</text>
+
+  <!-- brush -->
+  <rect x="510" y="170" width="205" height="70" class="tool-box" rx="4"/>
+  <text x="612" y="196" class="tool-name">brush</text>
+  <text x="612" y="216" class="tool-desc">Rust, cross-platform</text>
+  <text x="612" y="230" class="tool-desc">Runs on more hardware</text>
+
+  <!-- LichtFeld (highlighted) -->
+  <rect x="735" y="170" width="205" height="70" class="tool-box-highlight" rx="4"/>
+  <text x="837" y="196" class="tool-name">LichtFeld</text>
+  <text x="837" y="216" class="tool-desc">Low-level access</text>
+  <text x="837" y="230" class="tool-desc">Selected for this project</text>
+  <rect x="820" y="148" width="70" height="22" class="choice-pill" rx="11"/>
+  <text x="855" y="163" class="choice-label" text-anchor="middle">SELECTED</text>
+
+  <!-- Commercial row -->
+  <rect x="40" y="275" width="920" height="155" class="box" rx="6"/>
+  <text x="60" y="300" class="section-label">COMMERCIAL</text>
+  <text x="60" y="325" class="body" font-style="italic">Hosted / one-click pipelines. Fast but opaque — limited ability to modify the training process.</text>
+
+  <!-- LUMA -->
+  <rect x="60" y="345" width="205" height="70" class="tool-box" rx="4"/>
+  <text x="162" y="371" class="tool-name">LUMA</text>
+  <text x="162" y="391" class="tool-desc">Cloud-based</text>
+  <text x="162" y="405" class="tool-desc">Strong on object scans</text>
+
+  <!-- Scaniverse -->
+  <rect x="285" y="345" width="205" height="70" class="tool-box" rx="4"/>
+  <text x="387" y="371" class="tool-name">Scaniverse</text>
+  <text x="387" y="391" class="tool-desc">Mobile-first (Niantic)</text>
+  <text x="387" y="405" class="tool-desc">SPZ format export</text>
+
+  <!-- Polycam -->
+  <rect x="510" y="345" width="205" height="70" class="tool-box" rx="4"/>
+  <text x="612" y="371" class="tool-name">Polycam</text>
+  <text x="612" y="391" class="tool-desc">Mobile + web</text>
+  <text x="612" y="405" class="tool-desc">Photogrammetry + GS</text>
+
+  <!-- Kiri Engine -->
+  <rect x="735" y="345" width="205" height="70" class="tool-box" rx="4"/>
+  <text x="837" y="371" class="tool-name">Kiri Engine</text>
+  <text x="837" y="391" class="tool-desc">Mobile + web</text>
+  <text x="837" y="405" class="tool-desc">Consumer-oriented</text>
+
+  <!-- Why LichtFeld -->
+  <rect x="40" y="450" width="920" height="175" class="box" rx="6"/>
+  <text x="60" y="475" class="section-label">WHY LICHTFELD</text>
+  <text x="60" y="500" class="body-mid" font-weight="500">Low-level access enables critical modifications for this research.</text>
+
+  <line x1="60" y1="512" x2="940" y2="512" class="divider"/>
+
+  <!-- Four reasons in 2x2 grid -->
+  <circle cx="70" cy="535" r="2.5" fill="#000"/>
+  <text x="85" y="540" class="feature-title">Custom masking</text>
+  <text x="85" y="557" class="feature-desc">Apply SAM2 masks during training to exclude transient elements from loss computation.</text>
+
+  <circle cx="500" cy="535" r="2.5" fill="#000"/>
+  <text x="515" y="540" class="feature-title">Training strategy control</text>
+  <text x="515" y="557" class="feature-desc">Modify densification, pruning, and optimization schedule for interior scenes.</text>
+
+  <circle cx="70" cy="585" r="2.5" fill="#000"/>
+  <text x="85" y="590" class="feature-title">Fisheye training (GUI)</text>
+  <text x="85" y="607" class="feature-desc">Supports fisheye projection natively — avoids lossy re-projection to pinhole.</text>
+
+  <circle cx="500" cy="585" r="2.5" fill="#000"/>
+  <text x="515" y="590" class="feature-title">Image tiling</text>
+  <text x="515" y="607" class="feature-desc">Splits high-res images into tiles for memory-efficient training on interior scenes.</text>
+</svg>

@@ -39,8 +39,12 @@ const IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.svg', '.
 
 async function copyFolder(from, to) {
   const entries = await readdir(from, { withFileTypes: true });
+  // Skip "name (1).png"-style copies — they'd show up twice in the gallery.
   const images = entries.filter(
-    (e) => e.isFile() && IMAGE_EXT.has(path.extname(e.name).toLowerCase()),
+    (e) =>
+      e.isFile() &&
+      IMAGE_EXT.has(path.extname(e.name).toLowerCase()) &&
+      !/ \(\d+\)\.[^.]+$/.test(e.name),
   );
   if (images.length === 0) return 0;
 

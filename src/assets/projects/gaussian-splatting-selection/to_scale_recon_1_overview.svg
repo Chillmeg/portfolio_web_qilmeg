@@ -1,0 +1,81 @@
+<svg width="1000" height="380" viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg" font-family="Poppins, sans-serif">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&amp;display=swap');
+    text { font-family: 'Poppins', sans-serif; fill: #000; }
+    .title { font-size: 24px; font-weight: 600; }
+    .subtitle { font-size: 14px; font-weight: 300; fill: #555; font-style: italic; }
+    .stage-label { font-size: 11px; font-weight: 500; fill: #666; letter-spacing: 1.5px; }
+    .stage-title { font-size: 15px; font-weight: 600; }
+    .item-title { font-size: 12px; font-weight: 500; }
+    .item-desc { font-size: 11px; font-weight: 300; fill: #444; }
+    .stage-box { fill: #fff; stroke: #000; stroke-width: 1.2; }
+    .sub-box { fill: #fff; stroke: #000; stroke-width: 0.6; }
+    .arrow { stroke: #000; stroke-width: 1.2; fill: none; }
+  </style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <text x="40" y="44" class="title">Scene reconstruction — pipeline</text>
+  <text x="40" y="66" class="subtitle">End-to-end flow from raw 360 capture to trained 3D Gaussian Splatting scene.</text>
+
+  <!-- Stage 1: Raw input -->
+  <rect x="40" y="110" width="175" height="200" class="stage-box" rx="6"/>
+  <text x="55" y="135" class="stage-label">STAGE 1</text>
+  <text x="55" y="158" class="stage-title">Raw input</text>
+  <rect x="55" y="180" width="145" height="45" class="sub-box" rx="4"/>
+  <text x="65" y="199" class="item-title">360 video</text>
+  <text x="65" y="216" class="item-desc">.insv files</text>
+  <rect x="55" y="240" width="145" height="45" class="sub-box" rx="4"/>
+  <text x="65" y="259" class="item-title">Insta360 X4</text>
+  <text x="65" y="276" class="item-desc">8K video capture</text>
+
+  <line x1="215" y1="210" x2="245" y2="210" class="arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 2: Data processing -->
+  <rect x="245" y="110" width="235" height="200" class="stage-box" rx="6"/>
+  <text x="260" y="135" class="stage-label">STAGE 2</text>
+  <text x="260" y="158" class="stage-title">Data processing</text>
+  <rect x="260" y="180" width="205" height="60" class="sub-box" rx="4"/>
+  <text x="270" y="199" class="item-title">Input types</text>
+  <text x="270" y="216" class="item-desc">Fisheye · equirectangular ·</text>
+  <text x="270" y="231" class="item-desc">pinhole images</text>
+  <rect x="260" y="250" width="205" height="45" class="sub-box" rx="4"/>
+  <text x="270" y="269" class="item-title">Masking</text>
+  <text x="270" y="286" class="item-desc">SAM2 for object isolation</text>
+
+  <line x1="480" y1="210" x2="510" y2="210" class="arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 3: Camera alignment -->
+  <rect x="510" y="110" width="235" height="200" class="stage-box" rx="6"/>
+  <text x="525" y="135" class="stage-label">STAGE 3</text>
+  <text x="525" y="158" class="stage-title">Camera alignment</text>
+  <rect x="525" y="180" width="205" height="45" class="sub-box" rx="4"/>
+  <text x="535" y="199" class="item-title">Tools</text>
+  <text x="535" y="216" class="item-desc">Agisoft Metashape / COLMAP</text>
+  <rect x="525" y="240" width="205" height="60" class="sub-box" rx="4"/>
+  <text x="535" y="259" class="item-title">Outputs (binary)</text>
+  <text x="535" y="276" class="item-desc">cameras · points3D (sparse) ·</text>
+  <text x="535" y="291" class="item-desc">images</text>
+
+  <line x1="745" y1="210" x2="775" y2="210" class="arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 4: Training -->
+  <rect x="775" y="110" width="185" height="200" class="stage-box" rx="6"/>
+  <text x="790" y="135" class="stage-label">STAGE 4</text>
+  <text x="790" y="158" class="stage-title">Training</text>
+  <rect x="790" y="180" width="155" height="60" class="sub-box" rx="4"/>
+  <text x="800" y="199" class="item-title">Open source</text>
+  <text x="800" y="216" class="item-desc">gsplat · nerfstudio</text>
+  <text x="800" y="231" class="item-desc">brush · LichtFeld</text>
+  <rect x="790" y="250" width="155" height="60" class="sub-box" rx="4"/>
+  <text x="800" y="269" class="item-title">Commercial</text>
+  <text x="800" y="286" class="item-desc">LUMA · Scaniverse ·</text>
+  <text x="800" y="301" class="item-desc">Polycam · Kiri Engine</text>
+
+  <!-- Footer note -->
+  <text x="500" y="355" class="item-desc" text-anchor="middle" font-style="italic">Each stage is detailed in the following four diagrams.</text>
+</svg>

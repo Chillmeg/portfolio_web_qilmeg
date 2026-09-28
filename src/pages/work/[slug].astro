@@ -32,16 +32,35 @@ const vector = import.meta.glob<string>('../../assets/projects/*/*.svg', {
 });
 
 const inThisProject = (p: string) => p.includes(`/projects/${project.slug}/`);
+const fileName = (p: string) => p.slice(p.lastIndexOf('/') + 1);
 
-const images = Object.keys(raster)
-  .filter(inThisProject)
+type Asset = { raster: ImageMetadata } | { vector: string };
+const assets = new Map<string, Asset>();
+for (const k of Object.keys(raster).filter(inThisProject)) {
+  assets.set(fileName(k), { raster: raster[k].default });
+}
+for (const k of Object.keys(vector).filter(inThisProject)) {
+  assets.set(fileName(k), { vector: vector[k] });
+}
+
+// Listed images first, in the order given; anything else in the folder after,
+// alphabetically. A listed file that doesn't exist fails the build rather than
+// silently vanishing from the page.
+const listed = (project.images ?? []).map((s) => (typeof s === 'string' ? { file: s } : s));
+for (const { file } of listed) {
+  if (!assets.has(file)) {
+    throw new Error(`${project.slug}: images lists "${file}", not found in src/assets/projects/${project.slug}/`);
+  }
+}
+const unlisted = [...assets.keys()]
+  .filter((f) => !listed.some((s) => s.file === f))
   .sort()
-  .map((k) => raster[k].default);
+  .map((file) => ({ file, caption: undefined }));
 
-const vectors = Object.keys(vector).filter(inThisProject).sort().map((k) => vector[k]);
+const shots = [...listed, ...unlisted].map((s) => ({ ...s, asset: assets.get(s.file)! }));
 
 const hasMedia = (project.media?.length ?? 0) > 0;
-const hasImages = images.length + vectors.length > 0;
+const hasImages = shots.length > 0;
 const description = project.body?.[0]?.slice(0, 160);
 ---
 
@@ -124,22 +143,25 @@ const description = project.body?.[0]?.slice(0, 160);
             <div class="spacer" />
             <Line cmd>open {project.slug}/images/</Line>
             <div class="stack">
-              {vectors.map((src) => (
-                <figure class="shot shot--vector">
-                  <img src={src} alt={`${project.title} diagram`} loading="lazy" />
-                </figure>
-              ))}
-              {images.map((img) => (
-                <figure class="shot">
-                  <Image
-                    src={img}
-                    alt={project.title}
-                    widths={[480, 900, 1400]}
-                    sizes="(max-width: 48rem) 100vw, min(110ch, 90vw)"
-                    loading="lazy"
-                  />
-                </figure>
-              ))}
+              {shots.map(({ asset, caption }) =>
+                'vector' in asset ? (
+                  <figure class="shot shot--vector">
+                    <img src={asset.vector} alt={caption ?? `${project.title} diagram`} loading="lazy" />
+                    {caption && <figcaption>{caption}</figcaption>}
+                  </figure>
+                ) : (
+                  <figure class="shot">
+                    <Image
+                      src={asset.raster}
+                      alt={caption ?? project.title}
+                      widths={[480, 900, 1400]}
+                      sizes="(max-width: 48rem) 100vw, min(110ch, 90vw)"
+                      loading="lazy"
+                    />
+                    {caption && <figcaption>{caption}</figcaption>}
+                  </figure>
+                ),
+              )}
             </div>
           </>
         )
@@ -228,6 +250,14 @@ const description = project.body?.[0]?.slice(0, 160);
   .shot--vector img {
     padding: 1.5rem;
     background: var(--bg-raised);
+  }
+
+  .shot figcaption {
+    padding: 0.5em 0.7em;
+    font-size: var(--step--1);
+    color: var(--fg-muted);
+    background: var(--bg-inset);
+    border-top: 1px solid var(--term-border);
   }
 
   .back a {

@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
 import Terminal from '../components/Terminal.astro';
 import Line from '../components/Line.astro';
+import { Image } from 'astro:assets';
+import headshot from '../assets/about/headshot.jpg';
 
 /* From 01_Reference/about.md. Each string is a paragraph. */
 const bio = [
@@ -27,14 +29,11 @@ const thesisNote = {
     ' (2024). Across research and collaborative projects, she has built end-to-end workflows spanning LiDAR scanning, photogrammetry, XR environments, and digital fabrication.',
 };
 
-/*
- * NOTE: the CV link still points at Cargo's file host. Once the Cargo account
- * lapses that URL dies — put the PDF in public/ and switch this to /cv.pdf.
- */
+/* To update the CV, replace public/cv.pdf — the link doesn't change. */
 const links = [
   {
     label: 'cv',
-    href: 'https://freight.cargo.site/m/U2861150552621205196884946879018/Qilmeg_Doudatcz_CV_Mar26.pdf',
+    href: '/cv.pdf',
     text: 'Curriculum Vitae',
   },
   {
@@ -65,6 +64,13 @@ const links = [
   <div class="page">
     <Terminal title="qilmeg@qilmegd: ~/about">
       <Line cmd>cat about.md</Line>
+      <Image
+        class="headshot"
+        src={headshot}
+        alt="Qilmeg Doudatcz"
+        widths={[160, 320]}
+        sizes="160px"
+      />
       {bio.map((para) => <p class="para">{para}</p>)}
       <p class="para">
         {thesisNote.before}
@@ -118,6 +124,15 @@ const links = [
   .para {
     margin: 0.5em 0 1em;
     max-width: 68ch;
+  }
+
+  .headshot {
+    display: block;
+    width: 10rem;
+    height: auto;
+    margin: 0.6em 0 0.8em;
+    border: 1px solid var(--term-border);
+    border-radius: var(--radius);
   }
 
   .spacer {

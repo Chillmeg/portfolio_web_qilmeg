@@ -35,21 +35,29 @@ export interface Project {
   /** Outbound links (repos, live sites, exhibitions). */
   links?: { label: string; href: string }[];
   media?: Media[];
+  /**
+   * Gallery order and captions, by filename in src/assets/projects/<slug>/.
+   * Any file in that folder not listed here still shows, alphabetically, after
+   * these — so dropping a new image in never needs an edit here.
+   */
+  images?: Shot[];
+  /** Older work: listed under archive/ rather than in the main listing. */
+  archived?: boolean;
 }
 
+/** A gallery image — bare filename, or with a caption shown beneath it. */
+export type Shot = string | { file: string; caption?: string };
+
 /*
- * Transcribed from 01_Reference/work.md, in that file's order.
+ * Transcribed from 01_Reference/work.md, in that file's order, then checked
+ * against the live Cargo site (Sep 2026). Gallery order, captions and the
+ * archive/ projects come from Cargo; a full backup of its pages and original
+ * images is in ../assets_web/_cargo_backup/.
  *
- * TWO MAPPINGS I'M NOT SURE OF — check these:
- *  - `empathy-in-point-clouds` is what your earlier list called "Scan Work
- *    Selection" (it's the LiDAR/photogrammetry group). Thumb could be EIPC.png
- *    or lidar.jpg; I used EIPC.png.
- *  - `us-embassy-london` is what your earlier list called "Wood Working" — it's
- *    the basswood facade model. I've pointed it at the wood_workin image folder
- *    and glass-pavillion.png. If wood_workin is actually a separate project,
- *    say so and I'll split it back out.
+ * On Cargo, "Woodworking" linked to the US Embassy facade study, and "Scan
+ * Work Selection" linked to Empathy in Point Clouds.
  *
- * Unclaimed thumbnails: minga.png, Minga_4.png, sheep.png, vase2.jpg, chair.jpg.
+ * Unclaimed thumbnails: minga.png, lidar.jpg, vase2.jpg.
  */
 export const projects: Project[] = [
   {
@@ -67,6 +75,9 @@ export const projects: Project[] = [
     ],
     media: [
       { kind: 'youtube', id: 's842ibIC3Ds', title: 'GAIN AI — NASA SUITS', start: 1, autoplay: true },
+    ],
+    images: [
+      { file: 'gain_ai_system_diagram_minimal.svg', caption: 'GAIN AI System Architecture by Qilmeg' },
     ],
   },
   {
@@ -104,6 +115,13 @@ export const projects: Project[] = [
         title: 'Arch Lounge splat',
         aspect: '16 / 11',
       },
+    ],
+    images: [
+      { file: 'to_scale_recon_1_overview.svg', caption: 'Pipeline Overview' },
+      'to_scale_recon_2_rawinput.svg',
+      'to_scale_recon_3_processing.svg',
+      'to_scale_recon_4_alignment.svg',
+      { file: 'to_scale_recon_5_training.svg', caption: '4 Stages of Development' },
     ],
   },
   {
@@ -191,6 +209,16 @@ export const projects: Project[] = [
     media: [
       { kind: 'youtube', id: 'PHyLqhSx4fI', title: 'Yertönts, the Vertical World', autoplay: true },
     ],
+    images: [
+      'PosterLandscape.png',
+      '2024Nov_Doudatcz_Qilmeg_Portfolio_All4.jpg',
+      '2024Nov_Doudatcz_Qilmeg_Portfolio_All5.jpg',
+      '2024Nov_Doudatcz_Qilmeg_Portfolio_All6.jpg',
+      '2024Nov_Doudatcz_Qilmeg_Portfolio_All7.jpg',
+      '2024Nov_Doudatcz_Qilmeg_Portfolio_All8.jpg',
+      '2024Nov_Doudatcz_Qilmeg_Portfolio_All9.jpg',
+      '2024Nov_Doudatcz_Qilmeg_Portfolio_All10.jpg',
+    ],
   },
   {
     slug: 'carespace-xr',
@@ -213,6 +241,28 @@ export const projects: Project[] = [
     media: [
       { kind: 'youtube', id: '2-ghx1WQagI', title: 'CareSpace XR', start: 3, autoplay: true },
     ],
+    images: [
+      '2.jpg',
+      '3.jpg',
+      '4.jpg',
+      '5.jpg',
+      '6.jpg',
+      '7.jpg',
+      '8.jpg',
+      {
+        file: '9.jpg',
+        caption: 'The Playtest During Medical Innovations in Extended Reality Industry Meeting',
+      },
+      'outpu-2t.jpg',
+      {
+        file: 'output.jpg',
+        caption: 'University of Michigan School of Nursing Patient Care Room Panorama',
+      },
+      'Image4.png',
+      'Image1.png',
+      'Image2.png',
+      { file: 'Image3.png', caption: 'Patient Care Room Final Design' },
+    ],
   },
   {
     slug: 'empathy-in-point-clouds',
@@ -232,9 +282,28 @@ export const projects: Project[] = [
     // Three videos: only the first autoplays. Three simultaneous YouTube
     // players is a lot of bandwidth and a lot of motion at once.
     media: [
-      { kind: 'youtube', id: '5cM93TWp8kI', title: 'EIPC — reel', start: 6, autoplay: true },
-      { kind: 'youtube', id: 'a3jygEN9YHA', title: 'EIPC — scan visualisation', start: 26 },
-      { kind: 'youtube', id: '8O9RirchHx0', title: 'EIPC — TV Lab Trade Show', start: 22 },
+      {
+        kind: 'youtube',
+        id: '5cM93TWp8kI',
+        title: 'EIPC — TV Lab Trade Show',
+        start: 6,
+        autoplay: true,
+        caption: 'Winter 2023, Taubman College TV Lab Trade Show Presentation Video',
+      },
+      {
+        kind: 'youtube',
+        id: 'a3jygEN9YHA',
+        title: 'EIPC — Feast final presentation',
+        start: 26,
+        caption: 'EIPC 23 Feast Final Presentation',
+      },
+      {
+        kind: 'youtube',
+        id: '8O9RirchHx0',
+        title: 'EIPC — St. Mary Chapel walkthrough',
+        start: 22,
+        caption: 'St. Mary Chapel Walkthrough',
+      },
     ],
   },
   {
@@ -246,6 +315,7 @@ export const projects: Project[] = [
     meta: [
       { text: 'Academic Project' },
       { text: 'Arch 571: Advanced Digital Fabrication' },
+      { text: 'A series of stools designed and developed using digital fabrication methods.' },
       { text: 'Jan – May 2024' },
     ],
     body: [
@@ -253,6 +323,13 @@ export const projects: Project[] = [
     ],
     media: [
       { kind: 'youtube', id: 'i89b5LrXUaE', title: 'The Stool Series', start: 2, autoplay: true },
+    ],
+    images: [
+      'QilmegD_JointJoyStool-images-1.jpg',
+      'QilmegD_JointJoyStool-images-4.jpg',
+      'AeroStool_Qilmeg-Doudatcz-images-1.jpg',
+      'Screenshot-2025-01-30-124534.jpg',
+      'AeroStool_Qilmeg-Doudatcz-images-2.jpg',
     ],
   },
   {
@@ -272,13 +349,39 @@ export const projects: Project[] = [
       'More Room at The Table is a research project that delves into the concept and history of depth, exploring various ways of perceiving and sensing spatial depth. In my role as the XR specialist for this project, my main responsibilities encompass two distinct parts. Firstly, I bring the digital models created by my coworkers into VR headsets, establishing a controller-free VR navigation experience. Secondly, I bring the assets into AR, enabling the audience to navigate through the content on their phones.',
     ],
     media: [
-      { kind: 'youtube', id: 'tEMBzfBjd-Q', title: 'More Room at The Table', start: 6, autoplay: true },
+      {
+        kind: 'youtube',
+        id: 'tEMBzfBjd-Q',
+        title: 'More Room at The Table',
+        start: 6,
+        autoplay: true,
+        caption: 'VR Navigation Demo',
+      },
+    ],
+    images: [
+      { file: 'Hands-01.png', caption: 'Hand Gesture Definition in VR' },
+      'Spada.png',
+      'Serlio.png',
+      'Santa-Maria.png',
+      { file: 'cinema.png', caption: 'Assets Render' },
+      'vlcsnap-2024-06-04-00h13m33s496.png',
+      'vlcsnap-2024-10-09-09h54m03s729.png',
+      'vlcsnap-2024-10-09-09h54m23s770.png',
+      {
+        file: 'vlcsnap-2024-10-09-09h56m17s410.png',
+        caption: 'XR Stage Production with University of Michigan Center for Academic Innovation',
+      },
+      'Photo-Mar-22-2024--1-27-30-PM.jpg',
+      'IMG_8684.jpg',
+      'Photo-Mar-22-2024--1-08-24-PM.jpg',
+      { file: 'Photo-Mar-22-2024--1-13-04-PM.jpg', caption: 'Exhibition Footage' },
     ],
   },
   {
     slug: 'simulated-assemblies',
     title: 'Simulated Assemblies Lab',
     lens: ['developer', 'designer'],
+    thumb: 'Minga_4.png',
     meta: [
       { text: 'Research practice led by Professor Jose Sanchez' },
       { text: 'Sep 2024 – present' },
@@ -306,6 +409,19 @@ export const projects: Project[] = [
     body: [
       'The central goal of this project is to conduct an exhaustive structural and morphological examination of an octagonal compression-only slab, which is used to simulate the force condition of slabs or towers like the Tower of Pisa, culminating in the creation of a lightweight flooring system derived from this analysis. Employing the Grasshopper plugin for 3D graphic statics, the project systematically divided the polyhedron into three subdivisions, each subject to distinct constraints. Subsequently, it generated a form diagram, a force diagram, and a resolved form diagram for each of these stages. This comprehensive exploration and computational analysis are pivotal steps towards realizing an innovative and efficient lightweight floor system rooted in the unique properties of the octagonal compression-only prism.',
     ],
+    images: [
+      { file: 'slab1_Elevation_withPpl-01.png', caption: 'Final Design' },
+      {
+        file: 'Assignment-03_Qilmeg-Doudatcz_Sophia-Chen_ILLUSTRATOR-01.png',
+        caption: 'Octagonal Floor Slabs',
+      },
+      'Untitled-1_0005_individual-1.png',
+      'Untitled-1_0004_individual-2.png',
+      'Untitled-1_0006_formO.png',
+      'Untitled-1_0003_individual-3.png',
+      'Untitled-1_0002_individual-4.png',
+      { file: 'Untitled-1_0007_form.png', caption: 'Subdivision, Force and Form Diagram' },
+    ],
   },
   {
     slug: 'multi-stable-metamaterial',
@@ -318,6 +434,21 @@ export const projects: Project[] = [
       { text: 'Undergraduate thesis project' },
       { text: 'Southeast University Excellent Thesis of The Year award winner' },
       { text: 'Feb – Jun 2021' },
+    ],
+    media: [
+      { kind: 'youtube', id: 'fE9cI5mJ3j0', title: 'Multi-stable metamaterial', autoplay: true },
+    ],
+    images: [
+      'Slide8.png',
+      'Slide10.png',
+      'Slide12.png',
+      'Slide15.png',
+      'Slide18.png',
+      'Slide21.png',
+      'Slide23.png',
+      'Slide24.png',
+      'Slide25.png',
+      'Slide29.png',
     ],
   },
   {
@@ -335,6 +466,25 @@ export const projects: Project[] = [
     ],
     body: [
       "Our project aims to create a living and learning community through a set of interwoven public and private spaces. It establishes a hybridized form of collective work/life through a mixture of housing, youth education, and public engagement programming. This is aimed at attracting and retaining the younger population, both children and young adults, in Port Austin to support and enhance the town's future. For this reason, we have designed units that accommodate families, young adults, one-bedroom permanent residents, and camp groups.",
+      'To reinforce this formal narrative of a central core, we have designed an elevated pathway on the 2nd floor that connects the entire building. We envisioned this pathway as a means of traversing the project, but it has also become an extension of the living environment. Almost all of our housing units have their living space located on the second floor, encouraging the traditional living room to flow into the communal space. This results in an active space that is not only home to people but also features clotheslines, fire pits, barbecue grills, cornhole boards, giant Jenga sets, kayak storage, slides, and much more. In this way, we aim to break down typical distinctions between private and public space within housing by proposing a variety of shared spaces, ranging from two units to the entire complex.',
+      "Lastly, we recognized that Port Austin's activity varies across seasons. As a result, we have designed infrastructure that activates the site throughout the year. This is most evident in the design of camp units and the planting of four tree species — cherry, maple, pine, and oak. These trees serve additional functions beyond providing wood, as they produce fruit and maple sap, which can be harvested and processed for consumption.",
+    ],
+    images: [
+      { file: '2024Nov_Doudatcz_Qilmeg_Portfolio_All14.jpg', caption: 'Isometric View' },
+      'Site-Model-Photo.png',
+      { file: 'Site-model-angle.jpg', caption: 'Site Model' },
+      { file: 'diagrams-04.png', caption: 'Massing Diagram' },
+      { file: 'diagrams-01.png', caption: 'Unit Types' },
+      'diagrams-02.png',
+      'diagrams-03.png',
+      'diagrams-05.png',
+      'diagrams-06.png',
+      'diagrams-08.png',
+      { file: 'Perspective_amphitheater-01.png', caption: 'Perspective View 1' },
+      { file: 'last-3-perspectives-02.png', caption: 'Perspective View 2' },
+      { file: 'last-3-perspectives-03.png', caption: 'Perspective View 3' },
+      { file: 'last-3-perspectives-01.png', caption: 'Perspective View 4' },
+      { file: 'Perspective_Farmers-market-and-color-01.png', caption: 'Four Seasons on The Site' },
     ],
   },
   {
@@ -342,7 +492,7 @@ export const projects: Project[] = [
     title: 'US Embassy London Facade Study',
     lens: ['designer'],
     assets: 'wood_workin',
-    thumb: 'glass-pavillion.png',
+    thumb: 'wood.png',
     meta: [
       { text: 'Academic Project' },
       { text: 'Arch 552, Institution Studio' },
@@ -351,6 +501,25 @@ export const projects: Project[] = [
     body: [
       "This project aims to reconstruct the facade of the new US Embassy in London using only basswood and to document and visualize the physical model using various digital media. Due to the limited information available about the embassy's structures, I utilized Grasshopper to simulate the geometry and structure of the facade. The Grasshopper simulation provided the lengths and quantities of each component.",
       "To capture the unique geometry of the facade's framework, I created 12 jigs to bend the 1/16'' basswood into the desired curvature and assembled these thin, curved members with the thicker trusses. Subsequently, the physical model was scanned using a FARO Freestyle 2 Hand Scanner and cleaned up in FARO SCENE. I also explored various visual effects (VFX) techniques for the LiDAR.",
+    ],
+    media: [
+      {
+        kind: 'youtube',
+        id: 'gAiav9TFEc4',
+        title: 'US Embassy facade — LiDAR scan',
+        autoplay: true,
+        caption: 'LiDAR Scan of The Physical Model',
+      },
+    ],
+    images: [
+      'Layer-0.png',
+      'Untitled-1_0000s_0009_12.png',
+      'Untitled-1_0000s_0014_2.png',
+      { file: '4.png', caption: 'Final Model' },
+      'Untitled-1_0000s_0005_17.png',
+      'Untitled-1_0000s_0006_15.png',
+      'Untitled-1_0000s_0007_14.png',
+      { file: 'Untitled-1_0000s_0008_13.png', caption: 'Model Jig' },
     ],
   },
   {
@@ -366,6 +535,115 @@ export const projects: Project[] = [
     ],
     body: [
       'This project utilizes the Super Matter Tool and KUKA Robotic Arms for the production of extruded flower vases. Starting with an initial vase model generated in Grasshopper, a series of vases were printed to assess the impact of factors such as extrusion rate, nozzle temperature, speed, carbon fiber-to-acrylic ratio, and crease pattern on print quality. Subsequently, a combination of additive and subtractive methods was employed to further refine the prints. Additionally, acrylic pallets were mixed with hand-cut PLA and PETG materials to explore possible color variations in the prints.',
+    ],
+    images: [
+      'advanced-robotics-final_Page_3.png',
+      'advanced-robotics-final_Page_4.png',
+      'advanced-robotics-final_Page_5.png',
+      'advanced-robotics-final_Page_6.png',
+      'advanced-robotics-final_Page_8.png',
+      '_MG_9250.jpg',
+    ],
+  },
+
+  /* ---- archive/ — was under Archive on Cargo, reachable by URL only ---- */
+  {
+    slug: 'glass-pavilion',
+    title: 'The Crystal Pavilion of Glass Lifecycle',
+    lens: ['designer'],
+    archived: true,
+    thumb: 'glass-pavillion.png',
+    meta: [
+      { text: 'Academic Project' },
+      { text: 'Arch 422, Situation Studio' },
+      { text: 'Jan – May 2022' },
+    ],
+    body: [
+      "This project aims to showcase the lifecycle of glass both spatially and chronologically. The exhibition has organized the route for guests and workers by excavating upwards and utilizing the open space enclosed within the existing building on the site. The exhibition begins with an extruded entrance that presents the history of various types of glass and connects to the glass workshop, allowing visitors to experience glass production. Two diamond-shaped glass structures have been subdivided into different sections and linked by a raised wooden pathway. As visitors traverse this wooden path, they will journey through the glass's origins (sand), its properties (color, additives, subtractives, transparency), and its end-of-life considerations. Glass panels are affixed to steel frames and suspended on the frame in a specific sequence to juxtapose and compare different types of glass.",
+    ],
+    media: [
+      {
+        kind: 'youtube',
+        id: 'bDwAk_e7GSg',
+        title: 'The Crystal Pavilion of Glass Lifecycle — walkthrough',
+        start: 3,
+        caption: 'Walkthrough Video',
+      },
+    ],
+    images: [
+      { file: '2024Nov_Doudatcz_Qilmeg_Portfolio_All29.jpg', caption: 'Isometric View' },
+      { file: 'plan.jpg', caption: 'Plan' },
+      { file: 'section.jpg', caption: 'Section' },
+      { file: '2024Nov_Doudatcz_Qilmeg_Portfolio_All31.jpg', caption: 'Perspective Views' },
+      { file: 'assembly-final.jpg', caption: 'Assembly Diagram' },
+    ],
+  },
+  {
+    slug: 'micro-sheep',
+    title: 'Fibonacci — Micro Sheep on Kitchen Floor',
+    lens: ['designer'],
+    archived: true,
+    thumb: 'sheep.png',
+    meta: [
+      { text: 'Academic Project' },
+      { text: 'Arch 562, Collective Studio' },
+      { text: 'Aug 2022 – Sep 2023' },
+    ],
+    body: [
+      'This is a small project that aims to use stable diffusion, grasshopper programming, and other speculative methods to explore possible combinations of five keywords, including microlivestock, brick, floor, waste cycling system, and kitchen.',
+    ],
+    images: [
+      { file: 'research-02.jpg', caption: 'Final Design' },
+      {
+        file: 'Project-1_Qilmeg-Doudatcz_presentation-slides_Page_1.jpg',
+        caption: 'Stable Diffusion Generated Images',
+      },
+      {
+        file: 'Project-1_Qilmeg-Doudatcz_presentation-slides_Page_2.jpg',
+        caption: 'Grasshopper program for possible brick wall construction',
+      },
+      {
+        file: 'Project-1_Qilmeg-Doudatcz_presentation-slides_Page_3.jpg',
+        caption: 'Project Development',
+      },
+      { file: 'Project-1_Qilmeg-Doudatcz_presentation-slides_Page_5.jpg', caption: 'Final Design' },
+    ],
+  },
+  {
+    slug: 'ordos-reverie',
+    title: 'Ordos Reverie',
+    lens: ['designer'],
+    archived: true,
+    meta: [{ text: 'Photography' }],
+    body: [
+      "In the echoes of memory, my lens captures the essence of my hometown, Ordos. It wasn't until I left my hometown that I started to understand it. Through these photographs, I embark on a journey, revisiting the people and landscapes that cradle my most cherished memories.",
+      'Each image resonates with a subtle sentimentality, a longing for the past interwoven with the beauty of the present. With a background in engineering and design, I strive to create projects that embody a fusion of modern technology and age-old rituals. They serve as a testament to the enduring spirit of my hometown, where the past gracefully dances with the future.',
+    ],
+    images: [
+      '8-Ordos--China.jpg',
+      'IMG_1718.jpg',
+      'IMG_1799.jpg',
+      'IMG_2409.jpg',
+      'IMG_2405.jpg',
+      'IMG_2407.jpg',
+      'IMG_2408-1.jpg',
+      'IMG_2410.jpg',
+      'IMG_2413.jpg',
+      'IMG_2411.jpg',
+      'IMG_2412.jpg',
+      'IMG_2414.jpg',
+      'IMG_4317.jpg',
+      'IMG_4346.jpg',
+      'IMG_4354.jpg',
+      'IMG_4363.jpg',
+      'IMG_4396.jpg',
+      'IMG_4658.jpg',
+      'IMG_4647.jpg',
+      'IMG_6036.jpg',
+      'IMG_6650.jpg',
+      '3-Ordos--China.jpg',
+      '4-Ordos--China.jpg',
+      '2-Nanjing--China.jpg',
     ],
   },
 ];

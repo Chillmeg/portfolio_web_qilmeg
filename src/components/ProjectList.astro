@@ -1,13 +1,16 @@
 ---
 import Line from './Line.astro';
 import { projects } from '../data/projects';
+
+const current = projects.filter((p) => !p.archived);
+const archived = projects.filter((p) => p.archived);
 ---
 
 <Line cmd>ls work/</Line>
 
 <ul class="list">
   {
-    projects.map((p) => (
+    current.map((p) => (
       <li class="item" data-lens={p.lens.join(' ')}>
         <a href={`/work/${p.slug}/`}>
           <span class="item__mark" aria-hidden="true">
@@ -23,6 +26,26 @@ import { projects } from '../data/projects';
 <p class="empty">
   <Line comment>no matches for this lens — try `all` in the nav</Line>
 </p>
+
+{
+  archived.length > 0 && (
+    <div class="archive">
+      <Line cmd>ls work/archive/</Line>
+      <ul class="list">
+        {archived.map((p) => (
+          <li class="item" data-lens={p.lens.join(' ')}>
+            <a href={`/work/${p.slug}/`}>
+              <span class="item__mark" aria-hidden="true">
+                →
+              </span>
+              <span class="item__title">{p.title}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 <style>
   .list {
@@ -74,5 +97,11 @@ import { projects } from '../data/projects';
   :global(:root[data-lens='developer']) .list:not(:has(.item[data-lens~='developer'])) + .empty,
   :global(:root[data-lens='designer']) .list:not(:has(.item[data-lens~='designer'])) + .empty {
     display: revert;
+  }
+
+  /* The archive has no "no matches" line — it just drops out entirely. */
+  :global(:root[data-lens='developer']) .archive:not(:has(.item[data-lens~='developer'])),
+  :global(:root[data-lens='designer']) .archive:not(:has(.item[data-lens~='designer'])) {
+    display: none;
   }
 </style>

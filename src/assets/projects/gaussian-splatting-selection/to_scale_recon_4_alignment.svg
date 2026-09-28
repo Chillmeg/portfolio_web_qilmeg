@@ -1,0 +1,86 @@
+<svg width="1000" height="540" viewBox="0 0 1000 540" xmlns="http://www.w3.org/2000/svg" font-family="Poppins, sans-serif">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&amp;display=swap');
+    text { font-family: 'Poppins', sans-serif; fill: #000; }
+    .title { font-size: 24px; font-weight: 600; }
+    .subtitle { font-size: 14px; font-weight: 300; fill: #555; font-style: italic; }
+    .section-label { font-size: 11px; font-weight: 500; fill: #666; letter-spacing: 1.5px; }
+    .section-title { font-size: 16px; font-weight: 600; }
+    .body { font-size: 12px; font-weight: 300; fill: #333; }
+    .body-mid { font-size: 12px; font-weight: 400; fill: #222; }
+    .file-label { font-size: 13px; font-weight: 500; text-anchor: middle; }
+    .file-desc { font-size: 11px; font-weight: 300; fill: #555; text-anchor: middle; }
+    .pill-tag { font-size: 10px; font-weight: 500; fill: #fff; }
+    .branch-note { font-size: 11px; font-weight: 400; fill: #333; font-style: italic; }
+    .box { fill: #fff; stroke: #000; stroke-width: 1.2; }
+    .sub-box { fill: #fff; stroke: #000; stroke-width: 0.8; }
+    .tool-pill { fill: #000; stroke: #000; }
+    .arrow { stroke: #000; stroke-width: 1.2; fill: none; }
+  </style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <text x="40" y="44" class="title">Camera alignment — pose recovery + sparse reconstruction</text>
+  <text x="40" y="66" class="subtitle">Structure-from-motion resolves where each frame was shot from, and produces a sparse point cloud of the scene.</text>
+
+  <!-- Input -->
+  <rect x="40" y="100" width="200" height="80" class="box" rx="6"/>
+  <text x="140" y="127" class="file-label">Input</text>
+  <text x="140" y="148" class="file-desc">Masked fisheye or</text>
+  <text x="140" y="164" class="file-desc">equirectangular images</text>
+
+  <line x1="240" y1="140" x2="275" y2="140" class="arrow" marker-end="url(#arrow)"/>
+
+  <!-- Tool choice -->
+  <rect x="275" y="100" width="230" height="80" class="box" rx="6"/>
+  <text x="390" y="125" class="section-label" text-anchor="middle">TOOL</text>
+  <rect x="295" y="135" width="85" height="22" class="tool-pill" rx="11"/>
+  <text x="337" y="150" class="pill-tag" text-anchor="middle">Metashape</text>
+  <text x="390" y="150" class="body-mid" text-anchor="middle">or</text>
+  <rect x="400" y="135" width="85" height="22" class="tool-pill" rx="11"/>
+  <text x="442" y="150" class="pill-tag" text-anchor="middle">COLMAP</text>
+  <text x="390" y="172" class="body" text-anchor="middle" font-style="italic">Structure-from-motion (SfM)</text>
+
+  <line x1="505" y1="140" x2="540" y2="140" class="arrow" marker-end="url(#arrow)"/>
+
+  <!-- Output bundle -->
+  <rect x="540" y="100" width="420" height="80" class="box" rx="6"/>
+  <text x="750" y="125" class="section-label" text-anchor="middle">OUTPUTS — BINARY FILES</text>
+  <text x="750" y="150" class="body-mid" text-anchor="middle" font-weight="500">cameras · points3D (sparse) · images</text>
+  <text x="750" y="170" class="body" text-anchor="middle" font-style="italic">Standard COLMAP-compatible bundle, consumable by all GS trainers.</text>
+
+  <!-- Three output files in detail -->
+  <rect x="60" y="210" width="280" height="120" class="sub-box" rx="6"/>
+  <text x="200" y="235" class="file-label">cameras</text>
+  <text x="75" y="260" class="body">Intrinsic parameters per camera:</text>
+  <text x="75" y="276" class="body">focal length, principal point,</text>
+  <text x="75" y="292" class="body">distortion coefficients,</text>
+  <text x="75" y="308" class="body">projection model (fisheye / pinhole).</text>
+
+  <rect x="360" y="210" width="280" height="120" class="sub-box" rx="6"/>
+  <text x="500" y="235" class="file-label">points3D (sparse)</text>
+  <text x="375" y="260" class="body">Sparse point cloud — SfM feature</text>
+  <text x="375" y="276" class="body">matches triangulated into 3D.</text>
+  <text x="375" y="292" class="body">Becomes initialization seed for</text>
+  <text x="375" y="308" class="body">Gaussian Splatting training.</text>
+
+  <rect x="660" y="210" width="280" height="120" class="sub-box" rx="6"/>
+  <text x="800" y="235" class="file-label">images</text>
+  <text x="675" y="260" class="body">Per-image extrinsics:</text>
+  <text x="675" y="276" class="body">position (x, y, z) + rotation</text>
+  <text x="675" y="292" class="body">quaternion. Tells the trainer</text>
+  <text x="675" y="308" class="body">where every frame was captured.</text>
+
+  <!-- Optional branch: pinhole export -->
+  <rect x="40" y="360" width="920" height="140" class="box" rx="6" stroke-dasharray="4 3"/>
+  <text x="60" y="385" class="section-label">OPTIONAL BRANCH — PINHOLE EXPORT</text>
+  <text x="60" y="410" class="body-mid" font-weight="500">Metashape can re-project aligned views as pinhole images + masks simultaneously.</text>
+  <text x="60" y="435" class="body">Useful when the downstream trainer doesn't support fisheye natively. Because re-projection happens after</text>
+  <text x="60" y="451" class="body">alignment, the camera intrinsics are already known — Metashape handles the geometry transform cleanly and</text>
+  <text x="60" y="467" class="body">keeps image-mask correspondence intact. This is why "pinhole image" appears in Stage 2 but is generated here.</text>
+  <text x="60" y="488" class="branch-note">→ Feeds training pipelines that require pinhole input (most open-source GS trainers).</text>
+</svg>
