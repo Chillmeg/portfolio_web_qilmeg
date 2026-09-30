@@ -3,13 +3,21 @@ import '../styles/theme.css';
 // The only Vercel-specific code in the site. Off Vercel it just 404s a script;
 // to self-host, delete this import and the <Analytics /> tag below.
 import Analytics from '@vercel/analytics/astro';
+import Nav from '../components/Nav.astro';
+import SideMenu from '../components/SideMenu.astro';
 
 interface Props {
   title: string;
   description?: string;
+  /** Show the pinned project menu on the left (work and project pages). */
+  sideMenu?: boolean;
 }
 
-const { title, description = 'Qilmeg Doudatcz — architecture, computation, XR, heritage.' } = Astro.props;
+const {
+  title,
+  description = 'Qilmeg Doudatcz — architecture, computation, XR, heritage.',
+  sideMenu = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -22,92 +30,24 @@ const { title, description = 'Qilmeg Doudatcz — architecture, computation, XR,
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <Analytics />
-
-    {/*
-      Runs before first paint so a visitor who chose light doesn't get a black
-      flash on every navigation. `is:inline` keeps Astro from bundling and
-      deferring it — deferring is exactly what would cause the flash.
-    */}
-    <script is:inline>
-      (function () {
-        try {
-          var theme = localStorage.getItem('theme');
-          if (theme === 'light' || theme === 'dark') {
-            document.documentElement.dataset.theme = theme;
-          }
-          // The lens filters by CSS, so it has to be on <html> before paint or
-          // every visitor sees the full list flash before it narrows.
-          var lens = localStorage.getItem('lens');
-          if (lens === 'developer' || lens === 'designer') {
-            document.documentElement.dataset.lens = lens;
-          }
-        } catch (e) {
-          /* private mode / storage disabled — OS theme, unfiltered list */
-        }
-      })();
-    </script>
   </head>
 
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
-
-    <button
-      type="button"
-      class="theme-toggle"
-      data-theme-toggle
-      aria-label="Switch between light and dark theme"
-    >
-      <span aria-hidden="true">◐</span>
-    </button>
-
+    <Nav />
+    {sideMenu && <SideMenu />}
     <main id="main">
       <slot />
     </main>
-
-    <script>
-      const root = document.documentElement;
-      const toggle = document.querySelector('[data-theme-toggle]');
-
-      function current() {
-        if (root.dataset.theme) return root.dataset.theme;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
-
-      toggle?.addEventListener('click', () => {
-        const next = current() === 'dark' ? 'light' : 'dark';
-        root.dataset.theme = next;
-        try {
-          localStorage.setItem('theme', next);
-        } catch (e) {
-          /* nothing to do — the choice just won't survive a reload */
-        }
-      });
-    </script>
-
-    <style>
-      .theme-toggle {
-        position: fixed;
-        top: var(--gutter);
-        right: var(--gutter);
-        z-index: 10;
-        width: 2.25rem;
-        height: 2.25rem;
-        display: grid;
-        place-items: center;
-        font-family: var(--font-mono);
-        font-size: 1rem;
-        color: var(--fg-muted);
-        background: var(--bg-inset);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        cursor: pointer;
-        transition: color 0.15s, border-color 0.15s;
-      }
-
-      .theme-toggle:hover {
-        color: var(--accent);
-        border-color: var(--border-strong);
-      }
-    </style>
   </body>
 </html>
+
+<style is:global>
+  /* On phones the side menu is in the flow above the content, and has already
+     cleared the header — the content below doesn't need to again. */
+  @media (max-width: 760px) {
+    .side + main .main {
+      padding-top: 2rem;
+    }
+  }
+</style>

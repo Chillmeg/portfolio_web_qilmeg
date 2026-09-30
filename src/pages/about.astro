@@ -1,8 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
-import Terminal from '../components/Terminal.astro';
-import Line from '../components/Line.astro';
 import { Image } from 'astro:assets';
 import headshot from '../assets/about/headshot.jpg';
 
@@ -54,31 +51,36 @@ const links = [
     text: '@chillmeggg',
   },
 ];
+/* Cargo's About column: CV and profile as text links, email as plain text,
+   then GitHub / LinkedIn / Instagram as icons. */
+const textLinks = links.filter((l) => l.label === 'cv' || l.label === 'mit');
+const email = links.find((l) => l.label === 'email');
+const icons: Record<string, string> = {
+  github:
+    'M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z',
+  linkedin:
+    'M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z',
+  instagram:
+    'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16ZM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.86 5.86 0 0 0-2.13 1.38A5.86 5.86 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.38 2.13a5.86 5.86 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.86 5.86 0 0 0 2.13-1.38 5.86 5.86 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.86 5.86 0 0 0-1.38-2.13A5.86 5.86 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z',
+};
+const socials = links.filter((l) => l.label in icons);
 ---
 
 <Base
   title="About — Qilmeg Doudatcz"
   description="About Qilmeg Doudatcz — architecture, computation, XR, heritage."
 >
-  <Nav />
-  <div class="page">
-    <Terminal title="qilmeg@qilmegd: ~/about">
-      <Line cmd>cat about.md</Line>
-      <Image
-        class="headshot"
-        src={headshot}
-        alt="Qilmeg Doudatcz"
-        widths={[160, 320]}
-        sizes="160px"
-      />
-      {bio.map((para) => <p class="para">{para}</p>)}
-      <p class="para">
+  <div class="frame grid main">
+    <div class="col-text">
+      <h1>About</h1>
+      {bio.map((para) => <p>{para}</p>)}
+      <p>
         {thesisNote.before}
         {
           thesisNote.awards.map((a, i) => (
             <>
-              {i > 0 && ' and nominated for the '}
-              <a href={a.href} rel="noopener">
+              {i > 0 && ' (2024) and nominated for the '}
+              <a href={a.href} target="_blank" rel="noopener">
                 {a.text}
               </a>
             </>
@@ -86,92 +88,86 @@ const links = [
         }
         {thesisNote.after}
       </p>
+    </div>
 
-      <div class="spacer"></div>
-
-      <Line cmd>cat contact.txt</Line>
-      <dl class="links">
+    <div class="col-aside aside">
+      <Image class="headshot" src={headshot} alt="Qilmeg Doudatcz" widths={[240, 480]} sizes="12vw" />
+      <p class="small">
         {
-          links.map((l) => (
-            <div class="links__row">
-              <dt>{l.label}</dt>
-              <dd>
-                <a href={l.href} rel="noopener">
-                  {l.text}
-                </a>
-              </dd>
-            </div>
+          textLinks.map((l) => (
+            <>
+              <a href={l.href} target="_blank" rel="noopener">
+                {l.text}
+              </a>
+              <br />
+            </>
           ))
         }
-      </dl>
-
-      <div class="spacer"></div>
-
-      <Line cmd>ls ../</Line>
-      <p class="jump">
-        <a href="/work/">work/</a> <a href="/research/">research/</a>
+        {email && <>Email: {email.text}</>}
       </p>
-      <Line cursor />
-    </Terminal>
+      <p class="small socials">
+        {
+          socials.map((l) => (
+            <a href={l.href} target="_blank" rel="noopener" aria-label={l.label}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icons[l.label]} /></svg>
+            </a>
+          ))
+        }
+      </p>
+    </div>
   </div>
 </Base>
 
 <style>
-  .page {
-    padding: var(--gutter);
+  p {
+    margin: 0 0 1.5em;
   }
 
-  .para {
-    margin: 0.5em 0 1em;
-    max-width: 68ch;
+  .aside {
+    padding-top: 1rem;
   }
 
   .headshot {
     display: block;
-    width: 10rem;
+    width: 90%;
     height: auto;
-    margin: 0.6em 0 0.8em;
-    border: 1px solid var(--term-border);
-    border-radius: var(--radius);
+    margin-bottom: 2.5rem;
   }
 
-  .spacer {
-    height: 1.4em;
+  .aside .small {
+    margin: 0 0 1.5em;
   }
 
-  .links {
-    margin: 0.4em 0 0;
-    padding-left: 1.5ch;
-  }
-
-  .links__row {
+  .socials {
     display: flex;
-    gap: 1ch;
-    margin-bottom: 0.25em;
+    gap: 1.2rem;
   }
 
-  .links dt {
-    color: var(--fg-faint);
-    min-width: 9ch;
+  .socials a {
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 6px;
+    transition: background-color 160ms ease;
   }
 
-  .links dd {
-    margin: 0;
+  .socials a:hover {
+    background: var(--hover-bg);
   }
 
-  .jump {
-    display: flex;
-    gap: 2ch;
-    margin: 0.4em 0 0;
-    padding-left: 1.5ch;
+  .socials svg {
+    display: block;
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: var(--ink);
   }
 
-  .jump a {
-    color: var(--term-path);
-    text-decoration: none;
-  }
+  @media (max-width: 760px) {
+    .aside {
+      grid-row: 1;
+    }
 
-  .jump a:hover {
-    text-decoration: underline;
+    .headshot {
+      width: 12rem;
+    }
   }
 </style>

@@ -1,8 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
-import Terminal from '../components/Terminal.astro';
-import Line from '../components/Line.astro';
 
 // Transcribed from assets_web/01_Reference/research.md. Keep that file the
 // source of truth and re-sync by hand — it's a page's worth of citations, not
@@ -57,83 +54,54 @@ const blogs = [
   title="Research — Qilmeg Doudatcz"
   description="Publications and writing by Qilmeg Doudatcz."
 >
-  <Nav />
-  <div class="page">
-    <Terminal title="qilmeg@qilmegd: ~/research" wide>
-      <Line cmd>cat publications.bib</Line>
-      <ol class="refs">
+  <div class="frame grid main">
+    <div class="col-text">
+      <h2>Publications</h2>
+      <ul>
         {
           publications.map((p) => (
             <li>
-              <span class="refs__text">{p.text}</span>{' '}
-              <span class="refs__venue">{p.venue}</span>
+              {p.text} {p.venue}
               {p.href && (
                 <>
                   {' '}
-                  <a class="refs__link" href={p.href} rel="noopener">
-                    ↗
+                  <a href={p.href} target="_blank" rel="noopener">
+                    {p.href}
                   </a>
                 </>
               )}
             </li>
           ))
         }
-      </ol>
+      </ul>
 
-      <div class="spacer"></div>
-
-      <Line cmd>ls blogs/</Line>
-      <ul class="refs refs--plain">
+      <h2 class="later">Blogs</h2>
+      <ul>
         {
           blogs.map((b) => (
             <li>
-              <a href={b.href} rel="noopener">
+              <a href={b.href} target="_blank" rel="noopener">
                 {b.text}
               </a>
             </li>
           ))
         }
       </ul>
-      <Line cursor />
-    </Terminal>
+    </div>
   </div>
 </Base>
 
 <style>
-  .page {
-    padding: var(--gutter);
+  ul {
+    margin-top: 1.5em;
   }
 
-  .spacer {
-    height: 1.4em;
+  li {
+    margin-bottom: 1.5em;
+    overflow-wrap: anywhere;
   }
 
-  .refs {
-    margin: 0.5em 0 0;
-    padding-left: 3ch;
-    max-width: 82ch;
-  }
-
-  .refs li {
-    margin-bottom: 0.9em;
-    line-height: 1.55;
-  }
-
-  .refs::marker,
-  .refs li::marker {
-    color: var(--fg-faint);
-  }
-
-  .refs--plain {
-    list-style: none;
-    padding-left: 1.5ch;
-  }
-
-  .refs__venue {
-    color: var(--fg-muted);
-  }
-
-  .refs__link {
-    text-decoration: none;
+  .later {
+    margin-top: 1.5em;
   }
 </style>

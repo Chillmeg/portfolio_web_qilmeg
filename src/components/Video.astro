@@ -24,7 +24,7 @@ const { src, poster, caption, aspect } = Astro.props;
     data-autoplay-video
   >
   </video>
-  {caption && <figcaption>{caption}</figcaption>}
+  {caption && <figcaption class="caption">{caption}</figcaption>}
 </figure>
 
 <script>
@@ -57,10 +57,6 @@ const { src, poster, caption, aspect } = Astro.props;
 <style>
   .vid {
     margin: 0;
-    border: 1px solid var(--term-border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: #000;
   }
 
   .vid video {
@@ -69,12 +65,6 @@ const { src, poster, caption, aspect } = Astro.props;
     height: auto;
     aspect-ratio: var(--aspect, auto);
     object-fit: cover;
-  }
-
-  figcaption {
-    padding: 0.5em 0.7em;
-    font-size: var(--step--1);
-    color: var(--fg-muted);
-    background: var(--bg-inset);
+    background: #000;
   }
 </style>

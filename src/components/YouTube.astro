@@ -39,21 +39,18 @@ const src = `https://www.youtube-nocookie.com/embed/${id}?${params}`;
       allowfullscreen
       referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
-  {caption && <figcaption>{caption}</figcaption>}
+  {caption && <figcaption class="caption">{caption}</figcaption>}
 </figure>
 
 <style>
   .yt {
     margin: 0;
-    border: 1px solid var(--term-border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: #000;
   }
 
   .yt__frame {
     position: relative;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: var(--aspect, 16 / 9);
+    background: #000;
   }
 
   .yt__frame iframe {
@@ -62,12 +59,5 @@ const src = `https://www.youtube-nocookie.com/embed/${id}?${params}`;
     width: 100%;
     height: 100%;
     border: 0;
-  }
-
-  figcaption {
-    padding: 0.5em 0.7em;
-    font-size: var(--step--1);
-    color: var(--fg-muted);
-    background: var(--bg-inset);
   }
 </style>

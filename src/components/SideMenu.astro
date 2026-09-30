@@ -1,0 +1,95 @@
+---
+import { menu } from '../data/menu';
+
+/* Cargo's "Side Meu": pinned to the left of work and project pages. On phones
+   it stops being fixed and sits above the content instead. */
+const path = Astro.url.pathname;
+---
+
+<aside class="side" aria-label="Projects">
+  {
+    menu.map(({ section, items }) => (
+      <div class="group">
+        <span class="section">{section}</span>
+        <ul>
+          {items.map((item) =>
+            'href' in item ? (
+              <li>
+                <a href={item.href} target="_blank" rel="noopener">
+                  {item.label}
+                </a>
+              </li>
+            ) : (
+              <li>
+                <a
+                  href={`/work/${item.slug}/`}
+                  aria-current={path.startsWith(`/work/${item.slug}/`) ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ),
+          )}
+        </ul>
+      </div>
+    ))
+  }
+</aside>
+
+<style>
+  .side {
+    position: fixed;
+    top: calc(var(--header-h) + 4.4rem);
+    /* Line up with the left edge of the centred 75% frame. */
+    left: calc((100vw - 100vw * 0.75) / 2 + var(--pad) - 2rem);
+    width: calc(100vw * 0.75 * 0.25);
+    max-height: calc(100vh - var(--header-h) - 3rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+    z-index: 10;
+  }
+
+  .group {
+    margin-bottom: 1.2rem;
+  }
+
+  .section {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  a {
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    font-weight: 300;
+    line-height: 1.5;
+    text-decoration: none;
+    transition:
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  a:hover {
+    background: var(--hover-bg);
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 760px) {
+    .side {
+      position: static;
+      width: auto;
+      max-height: none;
+      padding: var(--header-h) var(--pad) 0;
+    }
+  }
+</style>

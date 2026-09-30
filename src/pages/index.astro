@@ -1,127 +1,58 @@
 ---
 import Base from '../layouts/Base.astro';
-import Terminal from '../components/Terminal.astro';
-import Line from '../components/Line.astro';
+
+/* Cargo's landing page: a looping YouTube video as the page backdrop, inset by
+   an 8rem margin and cover-cropped to fill it. Muted autoplay needs mute=1 as
+   well as autoplay=1, and YouTube only loops with an explicit playlist. */
+const id = 'n9dc7y0t1SQ';
+const params = new URLSearchParams({
+  autoplay: '1',
+  mute: '1',
+  loop: '1',
+  playlist: id,
+  controls: '0',
+  rel: '0',
+  playsinline: '1',
+  modestbranding: '1',
+});
+const src = `https://www.youtube-nocookie.com/embed/${id}?${params}`;
 ---
 
 <Base title="Qilmeg Doudatcz">
-  <div class="gate">
-    <Terminal title="qilmeg@qilmegd: ~">
-      <Line cmd>whoami</Line>
-      <Line>Qilmeg Doudatcz</Line>
-
-      <div class="spacer"></div>
-
-      <Line cmd>./portfolio --as</Line>
-      <Line>see Qilmeg&rsquo;s work as a:</Line>
-
-      <div class="choices">
-        <a class="choice" href="/work/" data-lens="developer">
-          <span class="choice__key" aria-hidden="true">[1]</span>
-          <span class="choice__label">developer</span>
-        </a>
-        <a class="choice" href="/work/" data-lens="designer">
-          <span class="choice__key" aria-hidden="true">[2]</span>
-          <span class="choice__label">designer</span>
-        </a>
-      </div>
-
-      <Line cursor><span class="sr-only">Awaiting selection</span></Line>
-    </Terminal>
+  <div class="backdrop" aria-hidden="true">
+    <iframe
+      src={src}
+      title="Portfolio reel"
+      tabindex="-1"
+      allow="autoplay; encrypted-media; picture-in-picture"
+      referrerpolicy="strict-origin-when-cross-origin"></iframe>
   </div>
 </Base>
 
-<script>
-  // Remember the choice so the gate isn't a toll booth on every visit, and so
-  // /work/ knows which lens to open in. Pressing 1 or 2 works too — the links
-  // stay real links, this only adds a shortcut.
-  const choices = Array.from(
-    document.querySelectorAll<HTMLAnchorElement>('[data-lens]'),
-  );
-
-  function remember(lens: string) {
-    try {
-      localStorage.setItem('lens', lens);
-    } catch (e) {
-      /* storage disabled — /work/ will just show everything */
-    }
-  }
-
-  choices.forEach((el) => {
-    el.addEventListener('click', () => remember(el.dataset.lens!));
-  });
-
-  document.addEventListener('keydown', (e) => {
-    const index = e.key === '1' ? 0 : e.key === '2' ? 1 : -1;
-    if (index === -1) return;
-    const el = choices[index];
-    if (!el) return;
-    remember(el.dataset.lens!);
-    el.click();
-  });
-</script>
-
 <style>
-  .gate {
-    display: grid;
-    /* Centre vertically, but *stretch* horizontally — `place-items: center`
-       would shrink-wrap the terminal to its longest line, leaving it narrower
-       than the same component on every other page. The 72ch cap and the auto
-       margins on .term do the centring instead. */
-    place-items: center stretch;
-    min-height: 100dvh;
-    padding: var(--gutter);
-  }
-
-  .spacer {
-    height: 1.2em;
-  }
-
-  .choices {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.75rem;
-    margin: 0.6em 0 1.2em;
-    padding-left: 1.5ch;
-  }
-
-  .choice {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.6ch;
-    text-decoration: none;
-    color: var(--fg);
-    padding: 0.15em 0.4em;
-    margin-left: -0.4em;
-    border-radius: var(--radius);
-  }
-
-  .choice__key {
-    color: var(--fg-faint);
-  }
-
-  .choice__label {
-    text-decoration: underline;
-    text-decoration-color: var(--accent-faint);
-  }
-
-  .choice:hover {
-    background: var(--accent-faint);
-  }
-
-  .choice:hover .choice__key {
-    color: var(--accent);
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
+  .backdrop {
+    position: fixed;
+    inset: 8rem;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
+    background: #000;
+    container-type: size;
+  }
+
+  /* object-fit: cover, for an iframe: whichever of width/height overflows. */
+  iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100cqw, 100cqh * 16 / 9);
+    height: max(100cqh, 100cqw * 9 / 16);
+    transform: translate(-50%, -50%);
     border: 0;
+    pointer-events: none;
+  }
+
+  @media (max-width: 760px) {
+    .backdrop {
+      inset: 8rem var(--pad) var(--pad);
+    }
   }
 </style>

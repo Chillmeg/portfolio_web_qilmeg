@@ -1,21 +1,73 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Nav from '../../components/Nav.astro';
-import Terminal from '../../components/Terminal.astro';
-import ProjectList from '../../components/ProjectList.astro';
+import { projects } from '../../data/projects';
+import { workGrid } from '../../data/menu';
+
+const thumbs = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/thumbnail/*.{jpeg,jpg,png,webp,avif}',
+  { eager: true },
+);
+
+const tiles = workGrid.map((slug) => {
+  const project = projects.find((p) => p.slug === slug);
+  if (!project) throw new Error(`menu.ts workGrid: no project "${slug}"`);
+  const key = `../../assets/thumbnail/${project.thumb}`;
+  if (!project.thumb || !thumbs[key]) {
+    throw new Error(`${slug}: thumb "${project.thumb}" not found in src/assets/thumbnail/`);
+  }
+  return { project, image: thumbs[key].default };
+});
 ---
 
-<Base title="Work — Qilmeg Doudatcz">
-  <Nav />
-  <div class="page">
-    <Terminal title="qilmeg@qilmegd: ~/work" wide>
-      <ProjectList />
-    </Terminal>
+<Base title="Work — Qilmeg Doudatcz" sideMenu>
+  <div class="frame grid main">
+    <ul class="col-content tiles">
+      {
+        tiles.map(({ project, image }) => (
+          <li>
+            <a href={`/work/${project.slug}/`}>
+              <Image
+                src={image}
+                alt={project.title}
+                widths={[400, 700, 1000]}
+                sizes="(max-width: 760px) 50vw, 20vw"
+              />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </Base>
 
 <style>
-  .page {
-    padding: var(--gutter);
+  .tiles {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  /* Cargo cropped every thumbnail to 16:9 with a 10px radius. */
+  .tiles a {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .tiles :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 760px) {
+    .tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 </style>

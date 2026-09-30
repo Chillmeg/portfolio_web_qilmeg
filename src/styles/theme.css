@@ -1,105 +1,35 @@
 /* ---------------------------------------------------------------------------
-   Terminal palette — light and dark.
+   Cargo mirror.
 
-   Light is deliberately a *paper-and-ink* terminal (a printed listing), not a
-   bleached copy of the dark theme. Both share one accent family so the site
-   reads as a single system either way round.
+   Values are lifted from the old qilmegd.cargo.site stylesheet (backup in
+   ../assets_web/_cargo_backup/) so the site reads the same as it did there.
+   Cargo sizes everything in rem off a viewport-scaled root, so the root size
+   is copied too and every rem below matches Cargo's number one-for-one.
 
-   Every colour is defined once here as a token. Components reference tokens
-   only — no literal hex values outside this file, or the toggle will develop
-   holes.
+   Font weights: Cargo's @font-face rules labelled Poppins *Light* as 200.
+   Real Poppins Light is 300, so "200" in Cargo's CSS is 300 here.
    --------------------------------------------------------------------------- */
 
-:root {
-  color-scheme: light;
-
-  --bg: #f2efe6;
-  --bg-inset: #e7e1d3;
-  --bg-raised: #fbf9f4;
-
-  --fg: #23211d;
-  --fg-muted: #6a645b;
-  --fg-faint: #9a9287;
-
-  --accent: #1d6b47;
-  --accent-fg: #ffffff;
-  --accent-faint: #d6e5dc;
-
-  --border: #cec6b4;
-  --border-strong: #a89f8b;
-
-  --selection: #cfe3d7;
-}
-
-/* System preference is dark — unless the visitor explicitly chose light. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    color-scheme: dark;
-
-    --bg: #0e100f;
-    --bg-inset: #171a18;
-    --bg-raised: #1d211f;
-
-    --fg: #d6dbd6;
-    --fg-muted: #8b938c;
-    --fg-faint: #5d645e;
-
-    --accent: #5fd39a;
-    --accent-fg: #0e100f;
-    --accent-faint: #1b2f26;
-
-    --border: #2a2f2c;
-    --border-strong: #3d4441;
-
-    --selection: #1f4536;
-  }
-}
-
-/* Explicit choice always wins, in both directions. */
-:root[data-theme='dark'] {
-  color-scheme: dark;
-
-  --bg: #0e100f;
-  --bg-inset: #171a18;
-  --bg-raised: #1d211f;
-
-  --fg: #d6dbd6;
-  --fg-muted: #8b938c;
-  --fg-faint: #5d645e;
-
-  --accent: #5fd39a;
-  --accent-fg: #0e100f;
-  --accent-faint: #1b2f26;
-
-  --border: #2a2f2c;
-  --border-strong: #3d4441;
-
-  --selection: #1f4536;
-}
-
-/* --------------------------------------------------------------------------
-   Non-colour tokens
-   -------------------------------------------------------------------------- */
+@import '@fontsource/poppins/300.css';
+@import '@fontsource/poppins/300-italic.css';
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/400-italic.css';
+@import '@fontsource/poppins/500.css';
 
 :root {
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono',
-    'Fira Code', Menlo, Consolas, monospace;
+  --ink: rgba(0, 0, 0, 0.85);
+  --ink-soft: rgba(0, 0, 0, 0.6);
+  --active: #ff0000;
+  --bg: #ffffff;
+  --hover-bg: rgba(0, 0, 0, 0.08);
 
-  /* Fluid type — no fixed character-width column, so a phone never has to
-     scroll sideways to read a line. */
-  --step--1: clamp(0.78rem, 0.74rem + 0.18vw, 0.88rem);
-  --step-0: clamp(0.92rem, 0.87rem + 0.24vw, 1.05rem);
-  --step-1: clamp(1.15rem, 1.02rem + 0.6vw, 1.5rem);
-  --step-2: clamp(1.5rem, 1.22rem + 1.3vw, 2.4rem);
-
-  --measure: 68ch;
-  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
-  --radius: 4px;
+  /* Cargo: .page-layout max-width 75%, .page-content padding 3rem. */
+  --layout-max: 75%;
+  --pad: 3rem;
+  --gutter: 2rem;
+  /* Clears the fixed top menu. */
+  --header-h: 8rem;
 }
-
-/* --------------------------------------------------------------------------
-   Base
-   -------------------------------------------------------------------------- */
 
 *,
 *::before,
@@ -108,48 +38,89 @@
 }
 
 html {
-  /* Respect the OS setting for people who get motion sick, site-wide. */
-  scroll-behavior: smooth;
+  /* Cargo's --base-size: 12.8px at a 1920px window. */
+  font-size: max(0.6667vw, 9px);
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Cargo switches to a phone layout with a larger fixed-ish scale. */
+@media (max-width: 760px) {
   html {
-    scroll-behavior: auto;
+    font-size: 10px;
   }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  :root {
+    --layout-max: 100%;
+    --pad: 1.6rem;
+    --header-h: 6rem;
   }
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
   background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-mono);
-  font-size: var(--step-0);
-  line-height: 1.6;
+  color: var(--ink);
+  font-family: Poppins, sans-serif;
+  font-weight: 300;
+  font-size: 1.4rem;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-}
-
-::selection {
-  background: var(--selection);
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  color: var(--accent);
-  text-underline-offset: 0.2em;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
 }
 
-/* Visible keyboard focus everywhere. A terminal aesthetic is no excuse for
-   losing the focus ring. */
+a:active {
+  opacity: 0.7;
+}
+
+a.active,
+a[aria-current='page'] {
+  color: var(--active);
+}
+
+h1 {
+  font-weight: 500;
+  font-size: 2.25rem;
+  line-height: 2.4;
+  margin: 0;
+}
+
+h2 {
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 2.1;
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0 0 0 2em;
+}
+
+.small {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+.caption {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.3;
+  margin-top: 0.5em;
+}
+
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--active);
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
 .skip-link {
@@ -157,8 +128,8 @@ a {
   left: -9999px;
   top: 0;
   padding: 0.5em 1em;
-  background: var(--accent);
-  color: var(--accent-fg);
+  background: var(--ink);
+  color: var(--bg);
   z-index: 100;
 }
 
@@ -167,27 +138,44 @@ a {
 }
 
 /* --------------------------------------------------------------------------
-   Terminal chrome tokens
-
-   These drive the window frame. Kept here with everything else so the frame
-   themes along with the rest of the site rather than drifting.
+   Page frame: Cargo's centred 75% column with a 12-column grid inside.
    -------------------------------------------------------------------------- */
 
-:root {
-  --term-bg: var(--bg-raised);
-  --term-bar: var(--bg-inset);
-  --term-border: var(--border);
-  --term-prompt: var(--accent);
-  --term-path: #7a6fb0;
-  --term-comment: var(--fg-faint);
+.frame {
+  width: 100%;
+  max-width: var(--layout-max);
+  margin: 0 auto;
+  padding: var(--pad);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --term-path: #9d8ee0;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+/* The first three columns are left empty on content pages: that's where the
+   fixed side menu sits. */
+.main {
+  padding-top: calc(var(--pad) + var(--header-h) + 0.6rem);
+}
+
+.col-content {
+  grid-column: 4 / span 9;
+}
+
+.col-text {
+  grid-column: 4 / span 7;
+}
+
+.col-aside {
+  grid-column: 11 / span 2;
+}
+
+@media (max-width: 760px) {
+  .col-content,
+  .col-text,
+  .col-aside {
+    grid-column: 1 / -1;
   }
-}
-
-:root[data-theme='dark'] {
-  --term-path: #9d8ee0;
 }
