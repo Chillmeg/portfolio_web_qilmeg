@@ -2,6 +2,9 @@
 dist/
 .astro/
 
+# claude
+.claude/
+
 # dependencies
 node_modules/
 
