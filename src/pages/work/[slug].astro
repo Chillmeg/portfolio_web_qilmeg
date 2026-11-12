@@ -54,7 +54,9 @@ const unlisted = [...assets.keys()]
   .sort()
   .map((file) => ({ file, caption: undefined }));
 
-const shots = [...listed, ...unlisted].map((s) => ({ ...s, asset: assets.get(s.file)! }));
+const hidden = new Set(project.hide ?? []);
+const shots = [...listed, ...unlisted]
+  .filter((s) => !hidden.has(s.file)).map((s) => ({ ...s, asset: assets.get(s.file)! }));
 
 const description = project.body?.[0]?.slice(0, 160);
 

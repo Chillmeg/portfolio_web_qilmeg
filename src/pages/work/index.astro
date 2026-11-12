@@ -30,6 +30,9 @@ const lensWord = (l: string) => (l === 'developer' ? 'engineering' : 'designing'
     <button type="button" data-f="designer" aria-pressed="false">Designing<svg class="ink bleed" aria-hidden="true"></svg></button>
   </div>
 
+  <!-- phone only: paper behind the figure, so list text scrolls under it, never over it -->
+  <div class="shelf" aria-hidden="true"></div>
+
   <figure class="figure still" id="figure">
     <div class="frames" id="frames"><div></div><div></div></div>
     <div class="empty note" id="empty" hidden>clip to come</div>
@@ -346,7 +349,27 @@ const lensWord = (l: string) => (l === 'developer' ? 'engineering' : 'designing'
     font-size: 17px;
   }
 
+  .shelf {
+    display: none;
+  }
+
   @media (max-width: 760px) {
+    .shelf {
+      display: block;
+      position: fixed;
+      z-index: 3;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--frame-top, 0px) + 18px);
+      background: linear-gradient(var(--paper) calc(100% - 18px), rgba(249, 248, 245, 0));
+      pointer-events: none;
+    }
+
+    .figure {
+      z-index: 4;
+    }
+
     .cap {
       top: calc(100% + 8px);
     }

@@ -55,6 +55,8 @@ export interface Project {
    * these — so dropping a new image in never needs an edit here.
    */
   images?: Shot[];
+  /** Files in that folder to leave off the page (the files themselves stay put). */
+  hide?: string[];
   /** Older work: listed under archive/ rather than in the main listing. */
   archived?: boolean;
 }
@@ -465,12 +467,14 @@ export const projects: Project[] = [
         file: 'Assignment-03_Qilmeg-Doudatcz_Sophia-Chen_ILLUSTRATOR-01.png',
         caption: 'Octagonal Floor Slabs',
       },
+    ],
+    hide: [
       'Untitled-1_0005_individual-1.png',
       'Untitled-1_0004_individual-2.png',
       'Untitled-1_0006_formO.png',
       'Untitled-1_0003_individual-3.png',
       'Untitled-1_0002_individual-4.png',
-      { file: 'Untitled-1_0007_form.png', caption: 'Subdivision, Force and Form Diagram' },
+      'Untitled-1_0007_form.png',
     ],
   },
   {
