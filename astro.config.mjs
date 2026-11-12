@@ -8,7 +8,8 @@ import { defineConfig } from 'astro/config';
  */
 const cargo = {
   '/': ['landinganim'],
-  '/work/': ['work-nav', 'archive'],
+  // 'photograph' was Ordos Reverie, hidden for now (projects.ts) — send it to the work list.
+  '/work/': ['work-nav', 'archive', 'photograph'],
   '/about/': ['bio'],
   '/research/': ['blogs-and-writing', 'blogs_and_writing'],
   '/work/nasa-suits-gain-ai/': ['nasa-suits', 'gain-ai', 'gain-ai-2'],
@@ -28,7 +29,6 @@ const cargo = {
   '/work/robotic-arm-3d-printing/': ['kuka-vases', 'kuka-vases-1', 'kuka-vases-ii'],
   '/work/glass-pavilion/': ['the-glass-pavillion', 'glass-pavillion', 'glass-pavillion-ii'],
   '/work/micro-sheep/': ['micro-sheep-on-kitchen-floor', 'micro-sheep', 'micro-sheep-ii'],
-  '/work/ordos-reverie/': ['photograph'],
 };
 
 const redirects = Object.fromEntries(

@@ -57,6 +57,8 @@ export interface Project {
   images?: Shot[];
   /** Files in that folder to leave off the page (the files themselves stay put). */
   hide?: string[];
+  /** Kept here but left off the site entirely: no map dot, no work row, no page. */
+  hidden?: boolean;
   /** Older work: listed under archive/ rather than in the main listing. */
   archived?: boolean;
 }
@@ -75,7 +77,7 @@ export type Shot = string | { file: string; caption?: string };
  *
  * Unclaimed thumbnails: minga.png, lidar.jpg, vase2.jpg.
  */
-export const projects: Project[] = [
+const all: Project[] = [
   {
     slug: 'nasa-suits-gain-ai',
     title: 'GAIN AI',
@@ -689,6 +691,7 @@ export const projects: Project[] = [
     short: 'Ordos Reverie',
     map: { x: 0.86, y: 0.3 },
     archived: true,
+    hidden: true,
     meta: [{ text: 'Photography' }],
     body: [
       "In the echoes of memory, my lens captures the essence of my hometown, Ordos. It wasn't until I left my hometown that I started to understand it. Through these photographs, I embark on a journey, revisiting the people and landscapes that cradle my most cherished memories.",
@@ -722,6 +725,9 @@ export const projects: Project[] = [
     ],
   },
 ];
+
+/** Everything the site shows. Set `hidden: true` on an entry to take it off without deleting it. */
+export const projects = all.filter((p) => !p.hidden);
 
 export function byLens(lens: Lens | null): Project[] {
   return projects.filter((p) => lens === null || p.lens.includes(lens));
