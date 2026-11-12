@@ -38,7 +38,7 @@ export interface Project {
    * in public/video/. Without one, the thumbnail shows instead.
    */
   video?: string;
-  /** Folder under assets_web/ holding this project's images. */
+  /** Legacy note of the original Cargo image folder. Not used: gallery images come from src/assets/projects/<slug>/. */
   assets?: string;
   /** Filename in src/assets/thumbnail/. Without one, the first gallery image stands in. */
   thumb?: string;
