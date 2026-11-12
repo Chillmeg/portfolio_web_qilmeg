@@ -1,6 +1,11 @@
 ---
-/* Cargo's pinned "TopMenu": name on the left, three links on a 12-column grid
-   with spans 3 / 1 / 2 / 2 / 2 / 2. The current section shows in red. */
+/* Name on the left (back to the map), three links on the right; the current
+   section gets a pencil underline. On the landing page the name is already in
+   the middle of the map, so it's left out here. */
+interface Props {
+  home?: boolean;
+}
+const { home = false } = Astro.props;
 const path = Astro.url.pathname;
 const items = [
   { href: '/work/', label: 'Work' },
@@ -9,20 +14,19 @@ const items = [
 ];
 ---
 
-<header class="top">
-  <nav class="frame grid" aria-label="Primary">
-    <a class="name" href="/">Qilmeg Doudatcz</a>
+<header class:list={['top', { home }]}>
+  {!home && <a class="name" href="/">Qilmeg Doudatcz</a>}
+  <nav aria-label="Primary">
     {
-      items.map(({ href, label }, i) => (
-        <a
-          class="link"
-          style={`grid-column: ${7 + i * 2} / span 2`}
-          href={href}
-          aria-current={path.startsWith(href) ? 'page' : undefined}
-        >
-          {label}
-        </a>
-      ))
+      items.map(({ href, label }) => {
+        const current = path.startsWith(href);
+        return (
+          <a href={href} aria-current={current ? 'page' : undefined}>
+            {label}
+            {current && <svg class="ink bleed" data-underline aria-hidden="true" />}
+          </a>
+        );
+      })
     }
   </nav>
 </header>
@@ -30,49 +34,63 @@ const items = [
 <style>
   .top {
     position: fixed;
+    z-index: 20;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: calc(22px + env(safe-area-inset-top, 0px)) var(--gut-r) 18px var(--gut);
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: linear-gradient(var(--paper) 70%, rgba(249, 248, 245, 0));
+  }
+
+  .top.home {
+    justify-content: flex-end;
+    background: none;
     pointer-events: none;
   }
 
-  .top a {
+  .top.home a {
     pointer-events: auto;
   }
 
-  .top nav {
-    align-items: baseline;
-  }
-
-  .name {
-    grid-column: 1 / span 3;
-    justify-self: start;
-    font-size: 1.5rem;
-    font-weight: 500;
-    line-height: 1.5;
+  .top a {
     text-decoration: none;
   }
 
-  .link {
-    justify-self: start;
-    font-size: 1.4rem;
-    font-weight: 300;
+  nav {
+    display: flex;
+    gap: 2.2em;
+  }
+
+  nav a {
+    position: relative;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
+  }
+
+  nav a[aria-current] {
+    text-decoration: none;
+  }
+
+  nav svg {
+    top: auto;
+    bottom: -7px;
+    left: -3px;
+    width: calc(100% + 6px);
+    height: 8px;
   }
 
   @media (max-width: 760px) {
-    .top {
-      background: var(--bg);
-    }
-
-    .top nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem 2rem;
-    }
-
-    .name {
-      flex-basis: 100%;
+    nav {
+      gap: 1.2em;
     }
   }
 </style>

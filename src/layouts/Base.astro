@@ -4,19 +4,21 @@ import '../styles/theme.css';
 // to self-host, delete this import and the <Analytics /> tag below.
 import Analytics from '@vercel/analytics/astro';
 import Nav from '../components/Nav.astro';
-import SideMenu from '../components/SideMenu.astro';
 
 interface Props {
   title: string;
   description?: string;
-  /** Show the pinned project menu on the left (work and project pages). */
-  sideMenu?: boolean;
+  /** Landing map: the name sits in the middle of the map, so the header leaves it out. */
+  home?: boolean;
+  /** Extra class on <body>, for page-level rules (scroll snap, no scroll). */
+  bodyClass?: string;
 }
 
 const {
   title,
-  description = 'Qilmeg Doudatcz — architecture, computation, XR, heritage.',
-  sideMenu = false,
+  description = 'Qilmeg Doudatcz — designer, developer and researcher working on 3D neural scene representations, XR and computational design.',
+  home = false,
+  bodyClass,
 } = Astro.props;
 ---
 
@@ -24,7 +26,7 @@ const {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
@@ -32,22 +34,22 @@ const {
     <Analytics />
   </head>
 
-  <body>
+  <body class={bodyClass}>
     <a class="skip-link" href="#main">Skip to content</a>
-    <Nav />
-    {sideMenu && <SideMenu />}
+    <!-- One shared filter: ink bleeding a pixel into the paper. -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <filter id="bleed" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="n"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="1.5" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+      </filter>
+    </svg>
+    <Nav home={home} />
     <main id="main">
       <slot />
     </main>
+    <script>
+      import { drawShared, onLayout } from '../scripts/ink';
+      onLayout(drawShared);
+    </script>
   </body>
 </html>
-
-<style is:global>
-  /* On phones the side menu is in the flow above the content, and has already
-     cleared the header — the content below doesn't need to again. */
-  @media (max-width: 760px) {
-    .side + main .main {
-      padding-top: 2rem;
-    }
-  }
-</style>

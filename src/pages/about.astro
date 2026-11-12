@@ -1,173 +1,339 @@
 ---
-import Base from '../layouts/Base.astro';
 import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
 import headshot from '../assets/about/headshot.jpg';
+import { statement, bio, links, education, skills, roadmap, type CvSection } from '../data/cv';
+import { entries } from '../data/research';
 
-/* From 01_Reference/about.md. Each string is a paragraph. */
-const bio = [
-  'Qilmeg Doudatcz is a 3D vision developer and computational designer working at the intersection of computer vision, 3D reconstruction, and spatial computing. Her work spans web-based immersive visualizations, digital preservation for cultural heritage, and autonomous vehicle perception. By leveraging technologies like 3D Gaussian Splatting (3DGS), photogrammetry, and neural reconstruction, she builds intelligent end-to-end workflows to interpret and visualize complex spatial environments.',
-  'She is currently an SMArchS Computation student at MIT and a Software Developer Intern within the perception department at Glydways, where she contributes to autonomous transit network perception pipelines. She holds a Master of Architecture from the University of Michigan Taubman College of Architecture and a Bachelor of Civil Engineering from Southeast University in Nanjing, China.',
-];
-
-/* Rendered after the bio so the award links stay clickable. */
-const thesisNote = {
-  before: 'Her thesis at UMich, developed in dialogue with Mongolian communities in Ordos, was recognized with the ',
-  awards: [
-    {
-      text: 'Burton L Kampner Thesis Memorial Award',
-      href: 'https://taubmancollege.umich.edu/students/awards/master-of-architecture-awards/',
-    },
-    {
-      text: "RIBA President's Medals, Silver Medal category",
-      href: 'https://www.presidentsmedals.com/Entry-64931',
-    },
-  ],
-  after:
-    ' (2024). Across research and collaborative projects, she has built end-to-end workflows spanning LiDAR scanning, photogrammetry, XR environments, and digital fabrication.',
-};
-
-/* To update the CV, replace public/cv.pdf — the link doesn't change. */
-const links = [
-  {
-    label: 'cv',
-    href: '/cv.pdf',
-    text: 'Curriculum Vitae',
-  },
-  {
-    label: 'mit',
-    href: 'https://architecture.mit.edu/people/qilmeg-doudatcz',
-    text: 'MIT Profile Page',
-  },
-  { label: 'email', href: 'mailto:qlmg954@mit.edu', text: 'qlmg954@mit.edu' },
-  { label: 'github', href: 'https://github.com/Chillmeg', text: 'github.com/Chillmeg' },
-  {
-    label: 'linkedin',
-    href: 'https://www.linkedin.com/in/qilmegdoudatcz/',
-    text: 'in/qilmegdoudatcz',
-  },
-  {
-    label: 'instagram',
-    href: 'https://www.instagram.com/chillmeggg',
-    text: '@chillmeggg',
-  },
-];
-/* Cargo's About column: CV and profile as text links, email as plain text,
-   then GitHub / LinkedIn / Instagram as icons. */
-const textLinks = links.filter((l) => l.label === 'cv' || l.label === 'mit');
-const email = links.find((l) => l.label === 'email');
-const icons: Record<string, string> = {
-  github:
-    'M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z',
-  linkedin:
-    'M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z',
-  instagram:
-    'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16ZM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.86 5.86 0 0 0-2.13 1.38A5.86 5.86 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.38 2.13a5.86 5.86 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.86 5.86 0 0 0 2.13-1.38 5.86 5.86 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.86 5.86 0 0 0-1.38-2.13A5.86 5.86 0 0 0 19.86.63C19.1.33 18.22.13 16.95.07 15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.4-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z',
-};
-const socials = links.filter((l) => l.label in icons);
+/* The CV as a page: a small figure and statement up top, then each section
+   as a hand-ruled timeline — dates left, a pencil spine, entries right. */
+const paperCount = entries.filter((e) => e.kind === 'p').length;
+const external = (href: string) => href.startsWith('http');
 ---
 
-<Base
-  title="About — Qilmeg Doudatcz"
-  description="About Qilmeg Doudatcz — architecture, computation, XR, heritage."
->
-  <div class="frame grid main">
-    <div class="col-text">
-      <h1>About</h1>
-      {bio.map((para) => <p>{para}</p>)}
-      <p>
-        {thesisNote.before}
-        {
-          thesisNote.awards.map((a, i) => (
-            <>
-              {i > 0 && ' (2024) and nominated for the '}
-              <a href={a.href} target="_blank" rel="noopener">
-                {a.text}
+<Base title="About — Qilmeg Doudatcz" description="Qilmeg Doudatcz — designer, developer and researcher. Education, skills, research and industry experience.">
+  <div class="page">
+    <section class="head">
+      <figure class="portrait" data-marks>
+        <Image src={headshot} alt="Qilmeg Doudatcz" widths={[240, 480]} sizes="190px" />
+        <figcaption class="mono"><span>fig. 00</span><span>Cambridge, MA</span></figcaption>
+      </figure>
+      <div>
+        <h1>Qilmeg Doudatcz</h1>
+        <p class="statement">{statement}</p>
+        <p class="bio">{bio}</p>
+        <div class="links mono">
+          {
+            links.map((l) => (
+              <a href={l.href} class:list={{ ring: l.ring }} {...(external(l.href) ? { target: '_blank', rel: 'noopener' } : {})}>
+                {l.label}
+                {l.ring && <svg class="ink bleed" data-ring="3" aria-hidden="true" />}
               </a>
-            </>
-          ))
-        }
-        {thesisNote.after}
-      </p>
-    </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
 
-    <div class="col-aside aside">
-      <Image class="headshot" src={headshot} alt="Qilmeg Doudatcz" widths={[240, 480]} sizes="12vw" />
-      <p class="small">
-        {
-          textLinks.map((l) => (
-            <>
-              <a href={l.href} target="_blank" rel="noopener">
-                {l.text}
-              </a>
-              <br />
-            </>
-          ))
-        }
-        {email && <>Email: {email.text}</>}
-      </p>
-      <p class="small socials">
-        {
-          socials.map((l) => (
-            <a href={l.href} target="_blank" rel="noopener" aria-label={l.label}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icons[l.label]} /></svg>
-            </a>
-          ))
-        }
-      </p>
-    </div>
+    {
+      [education, 'skills', ...roadmap].map((s) =>
+        s === 'skills' ? (
+          <section class="sec">
+            <h2 class="sec-h mono">
+              Skills
+              <svg class="ink bleed" data-underline aria-hidden="true" />
+            </h2>
+            <dl class="skills">
+              {skills.map(([k, v]) => (
+                <>
+                  <dt class="mono">{k}</dt>
+                  <dd>
+                    {v.map((x) => (
+                      <span>{x}</span>
+                    ))}
+                  </dd>
+                </>
+              ))}
+            </dl>
+          </section>
+        ) : (
+          <section class:list={['sec', { compact: (s as CvSection).compact }]}>
+            <h2 class="sec-h mono">
+              {(s as CvSection).heading}
+              <svg class="ink bleed" data-underline aria-hidden="true" />
+            </h2>
+            <div class="tl">
+              <svg class="ink bleed spine" aria-hidden="true" />
+              {(s as CvSection).items.map((e) => (
+                <div class="e">
+                  <span class="when mono">{e.when}</span>
+                  <span class="dot" />
+                  <div class="what">
+                    <h3>
+                      {e.title.map((t, i) => (
+                        <>
+                          {i > 0 && <br />}
+                          {t}
+                        </>
+                      ))}
+                    </h3>
+                    {e.where && <span class="where note">{e.where}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ),
+      )
+    }
+
+    <section class="sec">
+      <h2 class="sec-h mono">
+        Publications
+        <svg class="ink bleed" data-underline aria-hidden="true"></svg>
+      </h2>
+      <div class="pubs">
+        <p class="note">{paperCount} papers and preprints, 2025–2026. <a href="/research/">Read them on the research page →</a></p>
+      </div>
+    </section>
   </div>
 </Base>
 
 <style>
-  p {
-    margin: 0 0 1.5em;
+  .page {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: calc(var(--header-h) + 24px) var(--gut-r) 120px var(--gut);
   }
 
-  .aside {
-    padding-top: 1rem;
+  .head {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 64px;
+    align-items: start;
+    margin: 36px 0 84px;
   }
 
-  .headshot {
+  .portrait {
+    width: 190px;
+    margin: 14px 0 0 14px;
+  }
+
+  .portrait :global(img) {
     display: block;
-    width: 90%;
+    width: 100%;
     height: auto;
-    margin-bottom: 2.5rem;
+    filter: saturate(0.85);
   }
 
-  .aside .small {
-    margin: 0 0 1.5em;
-  }
-
-  .socials {
+  .portrait figcaption {
     display: flex;
-    gap: 1.2rem;
+    justify-content: space-between;
+    margin-top: 22px;
+    color: var(--ink-soft);
   }
 
-  .socials a {
-    display: inline-block;
-    padding: 2px 4px;
-    border-radius: 6px;
-    transition: background-color 160ms ease;
+  h1 {
+    margin: 0 0 18px;
+    font-weight: 500;
+    font-size: clamp(26px, 3vw, 40px);
+    letter-spacing: 0.01em;
   }
 
-  .socials a:hover {
-    background: var(--hover-bg);
+  .statement {
+    max-width: 36em;
+    margin: 0 0 22px;
+    font-size: 17px;
+    line-height: 1.6;
   }
 
-  .socials svg {
-    display: block;
-    width: 1.4rem;
-    height: 1.4rem;
-    fill: var(--ink);
+  .bio {
+    max-width: 44em;
+    margin: 0 0 28px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+  }
+
+  .links a {
+    position: relative;
+    padding: 4px 0;
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    text-decoration: underline;
+  }
+
+  .links a.ring {
+    padding: 4px 10px;
+  }
+
+  .sec {
+    margin-top: 72px;
+  }
+
+  .tl {
+    position: relative;
+  }
+
+  .tl .spine {
+    left: 150px;
+    width: 2px;
+  }
+
+  .e {
+    position: relative;
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    column-gap: 40px;
+    padding: 0 0 20px;
+  }
+
+  .when {
+    padding: 4px 22px 0 0;
+    text-align: right;
+    color: var(--ink-soft);
+  }
+
+  .dot {
+    position: absolute;
+    left: 150px;
+    top: 9px;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .e:hover .dot {
+    background: var(--ink);
+  }
+
+  .what {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .where {
+    font-size: 16px;
+  }
+
+  .compact .e {
+    padding-bottom: 14px;
+  }
+
+  .compact h3 {
+    font-size: 14px;
+  }
+
+  .skills {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    column-gap: 40px;
+    row-gap: 18px;
+    margin: 0;
+  }
+
+  .skills dt {
+    padding: 3px 22px 0 0;
+    text-align: right;
+    color: var(--ink-soft);
+  }
+
+  .skills dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .pubs {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    column-gap: 40px;
+  }
+
+  .pubs p {
+    grid-column: 2;
+    margin: 0;
+    font-size: 16px;
   }
 
   @media (max-width: 760px) {
-    .aside {
-      grid-row: 1;
+    .head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+      margin-top: 20px;
     }
 
-    .headshot {
-      width: 12rem;
+    .portrait {
+      width: 150px;
+    }
+
+    .tl .spine {
+      left: 6px;
+    }
+
+    .e {
+      grid-template-columns: minmax(0, 1fr);
+      padding-left: 28px;
+    }
+
+    .when {
+      padding: 0 0 4px;
+      text-align: left;
+    }
+
+    .dot {
+      left: 6px;
+      top: 4px;
+    }
+
+    .skills,
+    .pubs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .skills dt {
+      padding: 0;
+      text-align: left;
+    }
+
+    .pubs p {
+      grid-column: 1;
     }
   }
 </style>
+
+<script>
+  import { rule, onLayout } from '../scripts/ink';
+
+  // a pencil spine through each timeline, from its first dot to its last
+  onLayout(() => {
+    document.querySelectorAll<HTMLElement>('.tl').forEach((tl, k) => {
+      const spine = tl.querySelector<SVGSVGElement>('.spine')!;
+      const dots = [...tl.querySelectorAll<HTMLElement>('.dot')];
+      const y = (d: HTMLElement) => d.parentElement!.offsetTop + d.offsetTop + 4.5;
+      spine.innerHTML = '';
+      if (dots.length > 1) rule(spine, 0, y(dots[0]), 0, y(dots[dots.length - 1]), 600 + k, 0.9, 0.6);
+    });
+  });
+</script>

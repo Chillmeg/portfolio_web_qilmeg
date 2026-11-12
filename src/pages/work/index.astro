@@ -1,73 +1,570 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import { projects } from '../../data/projects';
-import { workGrid } from '../../data/menu';
+import { cover } from '../../lib/covers';
 
-const thumbs = import.meta.glob<{ default: ImageMetadata }>(
-  '../../assets/thumbnail/*.{jpeg,jpg,png,webp,avif}',
-  { eager: true },
+/* One project in focus at a time: a figure pinned left of centre, a hand-ruled
+   trunk right of it with one branch per project. Archived work branches off at
+   the end. Order is projects.ts order. */
+const items = await Promise.all(
+  projects.map(async (p) => ({
+    slug: p.slug,
+    title: p.title,
+    type: p.type,
+    lens: p.lens,
+    archived: !!p.archived,
+    x: p.map.x,
+    y: p.map.y,
+    still: await cover(p, 900),
+  })),
 );
-
-const tiles = workGrid.map((slug) => {
-  const project = projects.find((p) => p.slug === slug);
-  if (!project) throw new Error(`menu.ts workGrid: no project "${slug}"`);
-  const key = `../../assets/thumbnail/${project.thumb}`;
-  if (!project.thumb || !thumbs[key]) {
-    throw new Error(`${slug}: thumb "${project.thumb}" not found in src/assets/thumbnail/`);
-  }
-  return { project, image: thumbs[key].default };
-});
+const current = items.filter((p) => !p.archived);
+const archived = items.filter((p) => p.archived);
+const lensWord = (l: string) => (l === 'developer' ? 'engineering' : 'designing');
 ---
 
-<Base title="Work — Qilmeg Doudatcz" sideMenu>
-  <div class="frame grid main">
-    <ul class="col-content tiles">
-      {
-        tiles.map(({ project, image }) => (
-          <li>
-            <a href={`/work/${project.slug}/`}>
-              <Image
-                src={image}
-                alt={project.title}
-                widths={[400, 700, 1000]}
-                sizes="(max-width: 760px) 50vw, 20vw"
-              />
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+<Base title="Work — Qilmeg Doudatcz" description="Selected work by Qilmeg Doudatcz, from 3D reconstruction and AI to XR, architecture and fabrication." bodyClass="work-page">
+  <div class="filters mono" role="group" aria-label="Filter projects">
+    <button type="button" data-f="all" aria-pressed="true">All<svg class="ink bleed" aria-hidden="true"></svg></button>
+    <button type="button" data-f="developer" aria-pressed="false">Engineering<svg class="ink bleed" aria-hidden="true"></svg></button>
+    <button type="button" data-f="designer" aria-pressed="false">Designing<svg class="ink bleed" aria-hidden="true"></svg></button>
   </div>
+
+  <figure class="figure still" id="figure">
+    <div class="frames" id="frames"><div></div><div></div></div>
+    <div class="empty note" id="empty" hidden>clip to come</div>
+    <svg class="ink bleed" id="marks" aria-hidden="true"></svg>
+    <figcaption class="cap mono"><span id="cap-l"></span><span id="cap-r"></span></figcaption>
+  </figure>
+
+  <!-- No bleed filter here: its region is relative to a zero-height box and would clip the line. -->
+  <div class="leader" aria-hidden="true"><svg class="ink" id="leader"></svg></div>
+
+  <a class="minimap" href="/" aria-label="Back to the map">
+    <svg class="ink bleed" id="mm" aria-hidden="true"></svg>
+    <span class="m mono" style="left:50%;top:-16px;transform:translateX(-50%)">exp</span>
+    <span class="m mono" style="left:50%;bottom:-16px;transform:translateX(-50%)">sys</span>
+    <span class="m mono" style="left:-26px;top:50%;transform:translateY(-50%)">eng</span>
+    <span class="m mono" style="right:-26px;top:50%;transform:translateY(-50%)">des</span>
+    {items.map((p) => <span class="d" style={`left:${64 + p.x * 56}px;top:${64 - p.y * 56}px`} />)}
+    <span class="you" id="you"></span>
+  </a>
+  <div class="mm-cap note">where it lands</div>
+
+  <div class="list" id="list">
+    <svg class="ink bleed" id="trunk" aria-hidden="true"></svg>
+    {
+      [...current, ...archived].map((p, i) => (
+        <>
+          {p.archived && i === current.length && (
+            <div class="fork note" data-fork>
+              older work branches off here
+            </div>
+          )}
+          <article class="it" data-slug={p.slug} data-lens={p.lens.join(' ')}>
+            <span class="node" />
+            <div class="txt">
+              <span class="mono type">{p.type}</span>
+              <h2>
+                <a href={`/work/${p.slug}/`}>{p.title}</a>
+              </h2>
+              <div class="more note">
+                <span>{p.lens.map(lensWord).join(' + ')}</span>
+                <span aria-hidden="true">open project →</span>
+              </div>
+            </div>
+          </article>
+        </>
+      ))
+    }
+  </div>
+
+  <script type="application/json" id="work-data" set:html={JSON.stringify([...current, ...archived])} />
 </Base>
 
-<style>
-  .tiles {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+<style is:global>
+  html:has(body.work-page) {
+    scroll-snap-type: y proximity;
+    scroll-padding-top: var(--frame-top, 0px);
   }
 
-  /* Cargo cropped every thumbnail to 16:9 with a 10px radius. */
-  .tiles a {
-    display: block;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    border-radius: 10px;
-  }
-
-  .tiles :global(img) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  @media (max-width: 760px) {
-    .tiles {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  @media (prefers-reduced-motion: reduce) {
+    html:has(body.work-page) {
+      scroll-snap-type: none;
     }
   }
 </style>
+
+<style>
+  .filters {
+    position: fixed;
+    z-index: 15;
+    top: calc(62px + env(safe-area-inset-top, 0px));
+    right: var(--gut-r);
+    display: flex;
+    gap: 6px;
+  }
+
+  .filters button {
+    position: relative;
+    padding: 6px 10px;
+    border: 0;
+    background: none;
+    color: var(--ink-soft);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .filters button[aria-pressed='true'] {
+    color: var(--ink);
+  }
+
+  .filters button svg {
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .filters button[aria-pressed='true'] svg {
+    opacity: 1;
+  }
+
+  /* Sized by script to each image's own proportions — never cropped. */
+  .figure {
+    position: fixed;
+    z-index: 2;
+    margin: 0;
+    left: 0;
+    top: 0;
+    width: 240px;
+    height: 180px;
+    transition:
+      width 0.5s cubic-bezier(0.3, 0.7, 0.2, 1),
+      height 0.5s cubic-bezier(0.3, 0.7, 0.2, 1),
+      top 0.5s cubic-bezier(0.3, 0.7, 0.2, 1),
+      left 0.5s cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+
+  /* first placement is instant; only moves between projects animate */
+  .figure.still {
+    transition: none;
+  }
+
+  .frames {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .frames :global(div) {
+    position: absolute;
+    inset: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0;
+    filter: saturate(0.85);
+    transition: opacity 0.6s ease;
+  }
+
+  .frames :global(div.on) {
+    opacity: 1;
+  }
+
+  .empty {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 17px;
+  }
+
+  #marks {
+    transition: opacity 0.2s;
+  }
+
+  .figure.moving #marks {
+    opacity: 0;
+  }
+
+  .cap {
+    position: absolute;
+    top: calc(100% + 16px);
+    left: 0;
+    min-width: max(100%, 230px);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    color: var(--ink-soft);
+  }
+
+  .leader {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    top: var(--focus-y, 50vh);
+    height: 0;
+    pointer-events: none;
+  }
+
+  .minimap {
+    position: fixed;
+    z-index: 3;
+    right: var(--gut-r);
+    bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+    width: 128px;
+    height: 128px;
+    text-decoration: none;
+  }
+
+  .minimap .m {
+    position: absolute;
+    font-size: 8.5px;
+    color: var(--ink-soft);
+  }
+
+  .minimap .d {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
+    border-radius: 50%;
+    background: var(--ink-dim);
+  }
+
+  .minimap .you {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px 0 0 -4.5px;
+    border-radius: 50%;
+    background: var(--ink);
+    transition:
+      left 0.5s cubic-bezier(0.3, 0.7, 0.2, 1),
+      top 0.5s cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+
+  .mm-cap {
+    position: fixed;
+    z-index: 3;
+    right: var(--gut-r);
+    bottom: calc(168px + env(safe-area-inset-bottom, 0px));
+    font-size: 14px;
+  }
+
+  .list {
+    position: relative;
+    z-index: 2;
+    margin-left: calc(50vw + 40px);
+    width: min(34vw, 440px);
+    padding-top: calc(var(--focus-y, 50vh) - 9vh);
+    padding-bottom: calc(100vh - var(--focus-y, 50vh) - 9vh);
+  }
+
+  .it {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 18vh;
+    padding-left: 64px;
+    scroll-snap-align: center;
+    cursor: pointer;
+    opacity: var(--o, 0.3);
+    transition: opacity 0.35s ease;
+  }
+
+  .node {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px 0 0 -4.5px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    transition:
+      background 0.3s,
+      transform 0.3s;
+  }
+
+  .it.on .node {
+    background: var(--ink);
+    transform: scale(1.3);
+  }
+
+  .txt {
+    display: grid;
+    gap: 6px;
+  }
+
+  .type {
+    color: var(--ink-soft);
+  }
+
+  h2 {
+    margin: 0;
+    font-weight: 400;
+    font-size: clamp(17px, 1.55vw, 24px);
+    line-height: 1.25;
+    letter-spacing: 0.005em;
+    text-wrap: balance;
+  }
+
+  h2 a {
+    text-decoration: none;
+  }
+
+  .it.on h2 {
+    font-weight: 500;
+  }
+
+  .more {
+    display: flex;
+    gap: 18px;
+    align-items: baseline;
+    max-height: 0;
+    overflow: hidden;
+    font-size: 16px;
+    opacity: 0;
+    transition:
+      opacity 0.35s,
+      max-height 0.35s;
+  }
+
+  .it.on .more {
+    max-height: 2em;
+    opacity: 1;
+  }
+
+  .fork {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 12vh;
+    padding-left: 64px;
+    font-size: 17px;
+  }
+
+  @media (max-width: 760px) {
+    .cap {
+      top: calc(100% + 8px);
+    }
+
+    .leader,
+    .minimap,
+    .mm-cap {
+      display: none;
+    }
+
+    .filters {
+      top: auto;
+      right: 50%;
+      bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(50%);
+      background: var(--paper);
+    }
+
+    .list {
+      margin-left: 34px;
+      width: calc(100% - 50px);
+      padding-top: calc(var(--focus-y, 50vh) - 7vh);
+      padding-bottom: calc(100vh - var(--focus-y, 50vh) - 7vh);
+    }
+
+    .it {
+      min-height: 14vh;
+      padding-left: 40px;
+    }
+
+    .fork {
+      padding-left: 40px;
+    }
+  }
+</style>
+
+<script>
+  import { rule, cropMarks, ring, data, onLayout } from '../../scripts/ink';
+
+  type Item = {
+    slug: string;
+    title: string;
+    type: string;
+    lens: string[];
+    archived: boolean;
+    x: number;
+    y: number;
+    still: { src: string; w: number; h: number } | null;
+    el?: HTMLElement;
+    i?: number;
+  };
+
+  const $ = (id: string) => document.getElementById(id)!;
+  const root = document.documentElement;
+  const list = $('list');
+  const trunk = $('trunk') as unknown as SVGSVGElement;
+  const fig = $('figure');
+  const frames = [...$('frames').children] as HTMLDivElement[];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const items = data<Item[]>('work-data');
+  items.forEach((p, i) => {
+    p.i = i;
+    p.el = list.querySelector<HTMLElement>(`.it[data-slug="${p.slug}"]`)!;
+    // clicking anywhere on a row brings it into focus; the title link opens it
+    p.el.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('a')) return;
+      if (active === p) location.href = `/work/${p.slug}/`;
+      else p.el!.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  });
+  const visible = () => items.filter((p) => !p.el!.hidden);
+
+  /* ---- where the focus line sits ---- */
+  const PHONE_FIG_TOP = 96;
+  let focusY = innerHeight / 2;
+  function setFocusLine() {
+    if (innerWidth < 760) {
+      const top = PHONE_FIG_TOP + innerHeight * 0.26 + 40;
+      focusY = top + (innerHeight - top) / 2;
+      root.style.setProperty('--frame-top', `${top}px`);
+    } else {
+      focusY = innerHeight / 2;
+      root.style.setProperty('--frame-top', '0px');
+    }
+    root.style.setProperty('--focus-y', `${focusY}px`);
+  }
+
+  /* ---- the figure: each image at its own proportions, never cropped ---- */
+  function figureBox(p: Item | null) {
+    const W = innerWidth, H = innerHeight, phone = W < 760;
+    const maxW = phone ? W - 32 : Math.min(W * 0.26, 380), maxH = phone ? H * 0.26 : H * 0.4;
+    const iw = p?.still?.w ?? 4, ih = p?.still?.h ?? 3;
+    const s = Math.min(maxW / iw, maxH / ih), w = Math.round(iw * s), h = Math.round(ih * s);
+    // desktop: the figure's right edge sits just left of centre, facing the trunk
+    const left = phone ? (W - w) / 2 : W / 2 - 80 - w;
+    const top = phone ? PHONE_FIG_TOP + (maxH - h) / 2 : focusY - h / 2;
+    return { w, h, left, top, phone };
+  }
+  let markTimer: number | undefined;
+  function placeFigure(p: Item | null) {
+    const b = figureBox(p);
+    Object.assign(fig.style, { width: `${b.w}px`, height: `${b.h}px`, left: `${b.left}px`, top: `${b.top}px` });
+    cropMarks($('marks') as unknown as SVGSVGElement, b.w, b.h, 900);
+    fig.classList.add('moving');
+    clearTimeout(markTimer);
+    markTimer = window.setTimeout(() => fig.classList.remove('moving'), reduceMotion ? 0 : 480);
+    const leader = $('leader') as unknown as SVGSVGElement;
+    leader.innerHTML = '';
+    if (!b.phone) {
+      const lx = list.getBoundingClientRect().left;
+      rule(leader, b.left + b.w + 21, 0, lx - 10, 0, 950, 1, 0.7);
+      rule(leader, lx - 10, -4, lx - 10, 4, 951, 0.9, 0.7);
+    }
+  }
+
+  /* ---- the trunk, one branch per project ---- */
+  let branches: { p: Item; path: SVGPathElement }[] = [];
+  function drawTrunk() {
+    trunk.innerHTML = '';
+    branches = [];
+    const rows = [...list.querySelectorAll<HTMLElement>('.it, .fork')].filter((c) => !c.hidden);
+    if (!rows.length) return;
+    const ys = rows.map((c) => c.offsetTop + c.offsetHeight / 2);
+    const bx = parseFloat(getComputedStyle(rows[0]).paddingLeft) - 14;
+    for (let k = 0; k < ys.length - 1; k++) rule(trunk, 0, ys[k], 0, ys[k + 1], 300 + k, 1, 0.75);
+    rows.forEach((c, k) => {
+      const y = ys[k];
+      if (c.dataset.fork !== undefined) {
+        rule(trunk, 0, y - 18, bx * 0.55, y, 500 + k, 0.9, 0.6);
+        return;
+      }
+      const p = items.find((q) => q.el === c)!;
+      branches.push({ p, path: rule(trunk, 5, y, bx, y, 700 + p.i!, 1, 0.55)[0] });
+    });
+  }
+
+  function drawFurniture() {
+    placeFigure(active ?? visible()[0] ?? null);
+    const mm = $('mm') as unknown as SVGSVGElement;
+    mm.innerHTML = '';
+    rule(mm, 64, 4, 64, 124, 960, 0.8, 0.7);
+    rule(mm, 4, 64, 124, 64, 961, 0.8, 0.7);
+    document.querySelectorAll<SVGSVGElement>('.filters button svg').forEach((s, k) => ring(s, 980 + k));
+  }
+
+  /* ---- focus ---- */
+  let active: Item | null = null, flip = 0;
+  const fmt = (v: number) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2);
+  function activate(p: Item | null) {
+    if (p === active) return;
+    active = p;
+    for (const q of items) q.el!.classList.toggle('on', q === p);
+    for (const b of branches) {
+      b.path.setAttribute('opacity', b.p === p ? '0.95' : '0.55');
+      b.path.setAttribute('stroke-width', b.p === p ? '1.4' : '1');
+    }
+    if (!p) return;
+    const v = visible(), n = v.indexOf(p) + 1;
+    $('cap-l').textContent = `fig. ${String(n).padStart(2, '0')} / ${String(v.length).padStart(2, '0')}`;
+    $('cap-r').textContent = `x ${fmt(p.x)} · y ${fmt(p.y)}`;
+    $('empty').hidden = !!p.still;
+    placeFigure(p);
+    flip ^= 1;
+    const next = frames[flip], prev = frames[flip ^ 1];
+    if (p.still) {
+      next.style.backgroundImage = `url(${p.still.src})`;
+      next.classList.add('on');
+    } else next.classList.remove('on');
+    prev.classList.remove('on');
+    const you = $('you');
+    you.style.left = `${64 + p.x * 56}px`;
+    you.style.top = `${64 - p.y * 56}px`;
+  }
+
+  let raf = 0;
+  function onScroll() {
+    raf = 0;
+    let best: Item | null = null, bestD = Infinity;
+    const span = innerHeight * 0.32;
+    for (const p of items) {
+      if (p.el!.hidden) continue;
+      const r = p.el!.getBoundingClientRect();
+      const d = Math.abs(r.top + r.height / 2 - focusY);
+      p.el!.style.setProperty('--o', (0.22 + 0.5 * Math.max(0, 1 - d / span)).toFixed(3));
+      if (d < bestD) {
+        bestD = d;
+        best = p;
+      }
+    }
+    if (best) best.el!.style.setProperty('--o', '1');
+    activate(best);
+  }
+  addEventListener('scroll', () => {
+    if (!raf) raf = requestAnimationFrame(onScroll);
+  }, { passive: true });
+
+  /* ---- filters ---- */
+  document.querySelectorAll<HTMLButtonElement>('.filters button').forEach((b) =>
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.filters button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      const f = b.dataset.f!;
+      for (const p of items) p.el!.hidden = f !== 'all' && !p.lens.includes(f);
+      const fork = list.querySelector<HTMLElement>('[data-fork]');
+      if (fork) fork.hidden = !items.some((p) => p.archived && !p.el!.hidden);
+      active = null;
+      drawTrunk();
+      visible()[0]?.el!.scrollIntoView({ block: 'center' });
+      onScroll();
+    }),
+  );
+
+  onLayout(() => {
+    setFocusLine();
+    drawTrunk();
+    drawFurniture();
+    active = null;
+    onScroll();
+    setTimeout(() => fig.classList.remove('still'), 60);
+  });
+</script>

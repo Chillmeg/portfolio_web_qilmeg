@@ -1,107 +1,503 @@
 ---
 import Base from '../layouts/Base.astro';
+import { topics, entries, me } from '../data/research';
 
-// Transcribed from assets_web/01_Reference/research.md. Keep that file the
-// source of truth and re-sync by hand — it's a page's worth of citations, not
-// enough to justify a markdown pipeline.
-const publications = [
-  {
-    text: 'Doudatcz, Q., & Nagakura, N. (2026). Designing AI to design experiment for studying humans in spatial design: framework and case study.',
-    venue: 'Paper accepted, ACADIA 2026.',
-  },
-  {
-    text: 'Doudatcz, Q., & Nagakura, N. (2026). Morphic Memory: A crowdsourced vision-language framework for documenting vernacular architectural intelligence.',
-    venue: 'Abstract accepted, SiGraDi 2026.',
-  },
-  {
-    text: 'Ataman, B., Gallardo, R., Doudatcz, Q. (2026). Affective translation: Emotional engagement with textile soft robots across physical and augmented embodiments.',
-    venue: 'HCI International 2026 Posters (pp. 3–12). Springer.',
-    href: 'https://doi.org/10.1007/978-3-032-30819-1_1',
-  },
-  {
-    text: 'Gallardo, R., Doudatcz, Q., Goldstein, G., Sarimehmetoglu, I., Mutis, S., Kyaw, A. H., Lin, A., Emmerling, C., Ataman, B., & Tibbits, S. (2026). Context aware AI assistant and AR interface for lunar extravehicular activity (EVA) procedural guidance.',
-    venue: "SIGGRAPH '26 Conference Posters. ACM.",
-    href: 'https://doi.org/10.1145/3799825.3818743',
-  },
-  {
-    text: 'Ataman, B., Gallardo, R., & Doudatcz, Q. (2025). Affective translation: Material and virtual embodiments of kinetic textile robots.',
-    venue: 'arXiv:2601.11543 [cs.HC].',
-    href: 'https://doi.org/10.48550/arXiv.2601.11543',
-  },
-  {
-    text: 'Doudatcz, Q. (2025). Yertönts, the vertical world.',
-    venue: 'Dimensions, 38(1), 80.',
-  },
-  {
-    text: 'Tuladhar, S.*, Doudatcz, Q.*, & Samuelson, H. (in preparation). Measured thermal comfort performance of custom rice-husk insulation in cold climate emergency shelters.',
-    venue: 'Target journal: Building and Environment.',
-  },
-];
-
-const blogs = [
-  {
-    text: 'Erus, D., Liu, Y., & Doudatcz, Q. (2025). Multimodal scene representation learning for spatial and temporal understanding in video. MIT 6.7960 Final Project.',
-    href: 'https://chillmeg.github.io/25FA_MIT_67960_DL/',
-  },
-  {
-    text: 'RealityCapture Workflow Notes: Photogrammetry for Spatial Reconstruction',
-    href: 'https://upbeat-temper-37d.notion.site/264575007a8c80d2bc58c9b72de221bd?v=264575007a8c801b8f9e000c4986d3fc&source=copy_link',
-  },
-];
+/* A constellation of questions on top (topics as italic words, papers and
+   writing as numbered points), then the index to read from, numbered to match. */
+const numbered = entries.map((e, i) => ({ ...e, n: String(i + 1).padStart(2, '0') }));
+const papers = numbered.filter((e) => e.kind === 'p');
+const writing = numbered.filter((e) => e.kind === 'w');
+const bold = (by: string) => by.replace(me, `<b>${me}</b>`);
 ---
 
-<Base
-  title="Research — Qilmeg Doudatcz"
-  description="Publications and writing by Qilmeg Doudatcz."
->
-  <div class="frame grid main">
-    <div class="col-text">
-      <h2>Publications</h2>
-      <ul>
-        {
-          publications.map((p) => (
-            <li>
-              {p.text} {p.venue}
-              {p.href && (
-                <>
-                  {' '}
-                  <a href={p.href} target="_blank" rel="noopener">
-                    {p.href}
-                  </a>
-                </>
-              )}
-            </li>
-          ))
-        }
-      </ul>
-
-      <h2 class="later">Blogs</h2>
-      <ul>
-        {
-          blogs.map((b) => (
-            <li>
-              <a href={b.href} target="_blank" rel="noopener">
-                {b.text}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+<Base title="Research — Qilmeg Doudatcz" description="Papers and writing by Qilmeg Doudatcz on spatial AI, extended reality, 3D capture and heritage.">
+  <div class="page">
+    <div class="intro">
+      <p class="note">Papers and writing, joined by the questions they share.</p>
+      <span class="mono count">{papers.length} papers · {writing.length} writing</span>
     </div>
+
+    <section class="map" id="map" aria-label="Research map">
+      <svg class="ink bleed" id="map-lines" aria-hidden="true"></svg>
+      {
+        topics.map((t) => (
+          <button type="button" class="topic" data-topic={t.id}>
+            {t.name}
+          </button>
+        ))
+      }
+      {
+        numbered.map((e) => (
+          <button type="button" class:list={['node', { w: e.kind === 'w' }]} data-n={e.n} aria-label={`${e.n}: ${e.title}`}>
+            <i />
+            <b class="mono">{e.n}</b>
+          </button>
+        ))
+      }
+      <div class="cap" id="cap" aria-live="polite"></div>
+      <div class="legend mono"><span><i></i>paper</span><span><i class="w"></i>writing</span></div>
+    </section>
+
+    {
+      [
+        ['Papers', papers],
+        ['Writing', writing],
+      ].map(([heading, group]) => (
+        <section class="group">
+          <h2 class="sec-h mono">
+            {heading as string}
+            <svg class="ink bleed" data-underline aria-hidden="true" />
+          </h2>
+          <div class="rows">
+            {(group as typeof numbered).map((e) => (
+              <article class="row" id={`r${e.n}`} data-n={e.n}>
+                <span class="n mono">{e.n}</span>
+                <div class="main">
+                  <span class="mono venue">
+                    {e.venue}
+                    {e.status && e.href ? ` · ${e.status}` : ''}
+                  </span>
+                  <h3>{e.title}</h3>
+                  <span class="by" set:html={bold(e.by)} />
+                  {e.award && <span class="award note">{e.award}</span>}
+                </div>
+                <span class="act note">
+                  {e.href ? (
+                    <a href={e.href} target="_blank" rel="noopener">
+                      {e.kind === 'w' ? 'read' : 'read paper'} →
+                    </a>
+                  ) : (
+                    <span>{e.status ?? 'forthcoming'}</span>
+                  )}
+                </span>
+                <svg class="ink rule" aria-hidden="true" />
+              </article>
+            ))}
+          </div>
+          {heading === 'Writing' && (
+            <p class="soon note">New posts from the Obsidian blog folder will join this list, and the map.</p>
+          )}
+        </section>
+      ))
+    }
   </div>
+
+  <script
+    type="application/json"
+    id="research-data"
+    set:html={JSON.stringify({ topics, entries: numbered.map(({ n, title, venue, topics: t }) => ({ n, title, venue, topics: t })) })}
+  />
 </Base>
 
 <style>
-  ul {
-    margin-top: 1.5em;
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: calc(var(--header-h) + 24px) var(--gut-r) 120px var(--gut);
   }
 
-  li {
-    margin-bottom: 1.5em;
-    overflow-wrap: anywhere;
+  .intro {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    margin: 18px 0 8px;
   }
 
-  .later {
-    margin-top: 1.5em;
+  .intro p {
+    margin: 0;
+    font-size: 17px;
+  }
+
+  .count {
+    color: var(--ink-soft);
+  }
+
+  .map {
+    position: relative;
+    height: clamp(380px, 58vh, 600px);
+    margin: 8px 0 40px;
+  }
+
+  .topic {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    padding: 4px 6px;
+    border: 0;
+    background: none;
+    color: var(--ink-soft);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      color 0.3s,
+      opacity 0.3s;
+  }
+
+  .node {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transform: translate(-4.5px, -50%);
+    padding: 4px 4px 4px 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+
+  .node i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    transition:
+      background 0.25s,
+      transform 0.25s;
+  }
+
+  .node.w i {
+    border-style: dashed;
+  }
+
+  .map:global(.hot) .node,
+  .map:global(.hot) .topic {
+    opacity: 0.28;
+  }
+
+  .map:global(.hot) .node:global(.on),
+  .map:global(.hot) .topic:global(.on) {
+    opacity: 1;
+  }
+
+  .node:global(.on) i {
+    background: var(--ink);
+    transform: scale(1.25);
+  }
+
+  .topic:global(.on) {
+    color: var(--ink);
+  }
+
+  .map :global(svg.ink path) {
+    transition:
+      opacity 0.3s,
+      stroke-width 0.3s;
+  }
+
+  .cap {
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    max-width: min(560px, 100%);
+    display: grid;
+    gap: 4px;
+    pointer-events: none;
+  }
+
+  .cap :global(.t) {
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  .legend {
+    position: absolute;
+    right: 0;
+    bottom: -4px;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    color: var(--ink-soft);
+  }
+
+  .legend span {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .legend i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+  }
+
+  .legend i.w {
+    border-style: dashed;
+  }
+
+  .group {
+    margin-top: 64px;
+  }
+
+  .rows:global(.hot) .row {
+    opacity: 0.4;
+  }
+
+  .rows:global(.hot) .row:global(.on) {
+    opacity: 1;
+  }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) 150px;
+    gap: 20px;
+    padding: 22px 0;
+    transition: opacity 0.3s;
+  }
+
+  .row .n {
+    padding-top: 2px;
+  }
+
+  .main {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .venue {
+    color: var(--ink-soft);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+
+  .by {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+  }
+
+  .by :global(b) {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .award {
+    font-size: 15px;
+  }
+
+  .act {
+    padding-top: 2px;
+    text-align: right;
+    font-size: 16px;
+  }
+
+  .act a {
+    text-decoration: none;
+  }
+
+  .act a:hover {
+    text-decoration: underline;
+  }
+
+  svg.rule {
+    top: 0;
+    height: 2px;
+  }
+
+  .soon {
+    margin: 0;
+    padding: 22px 0 0 72px;
+    font-size: 16px;
+  }
+
+  @media (max-width: 760px) {
+    .map {
+      height: 108vw;
+      min-height: 360px;
+    }
+
+    .topic {
+      font-size: 15px;
+    }
+
+    .node b,
+    .legend {
+      display: none;
+    }
+
+    .row {
+      grid-template-columns: 34px minmax(0, 1fr);
+    }
+
+    .act {
+      grid-column: 2;
+      text-align: left;
+    }
+
+    .soon {
+      padding-left: 54px;
+    }
   }
 </style>
+
+<script>
+  import { rule, rng, data, onLayout } from '../scripts/ink';
+
+  type Topic = { id: string; name: string; x: number; y: number; el?: HTMLElement };
+  type Entry = {
+    n: string;
+    title: string;
+    venue: string;
+    topics: string[];
+    el?: HTMLElement;
+    row?: HTMLElement;
+    x?: number;
+    y?: number;
+    tx?: number;
+    ty?: number;
+  };
+
+  const $ = (id: string) => document.getElementById(id)!;
+  const map = $('map');
+  const lines = $('map-lines') as unknown as SVGSVGElement;
+  const cap = $('cap');
+  const { topics, entries } = data<{ topics: Topic[]; entries: Entry[] }>('research-data');
+  for (const t of topics) t.el = map.querySelector<HTMLElement>(`[data-topic="${t.id}"]`)!;
+  for (const e of entries) {
+    e.el = map.querySelector<HTMLElement>(`.node[data-n="${e.n}"]`)!;
+    e.row = document.querySelector<HTMLElement>(`.row[data-n="${e.n}"]`)!;
+  }
+
+  /* Each point settles between the topics it touches, then nudges away from
+     its neighbours so nothing overlaps. Seeded, so it lands the same way. */
+  function settle(W: number, H: number) {
+    const T: Record<string, { x: number; y: number }> = Object.fromEntries(topics.map((t) => [t.id, { x: t.x * W, y: t.y * H }]));
+    const r = rng(7);
+    for (const e of entries) {
+      const ts = e.topics.map((id) => T[id]);
+      e.tx = ts.reduce((s, t) => s + t.x, 0) / ts.length;
+      e.ty = ts.reduce((s, t) => s + t.y, 0) / ts.length;
+      if (ts.length === 1) {
+        e.tx += (r() - 0.5) * 120 + 40;
+        e.ty += (r() < 0.5 ? -1 : 1) * 56;
+      }
+      e.x = e.tx + (r() - 0.5) * 30;
+      e.y = e.ty + (r() - 0.5) * 30;
+    }
+    const minE = Math.min(78, W * 0.12), minT = 54;
+    for (let it = 0; it < 160; it++) {
+      for (const a of entries) {
+        let fx = (a.tx! - a.x!) * 0.04, fy = (a.ty! - a.y!) * 0.04;
+        for (const b of entries) {
+          if (b === a) continue;
+          const dx = a.x! - b.x!, dy = a.y! - b.y!, d = Math.hypot(dx, dy) || 0.01;
+          if (d < minE) {
+            fx += (dx / d) * (minE - d) * 0.3;
+            fy += (dy / d) * (minE - d) * 0.3;
+          }
+        }
+        // topics are words, wider than tall: measure distance to them squashed sideways
+        for (const t of Object.values(T)) {
+          const dx = (a.x! - t.x) / 2.6, dy = a.y! - t.y, d = Math.hypot(dx, dy) || 0.01;
+          if (d < minT) {
+            fx += (dx / d) * (minT - d) * 0.9;
+            fy += (dy / d) * (minT - d) * 0.4;
+          }
+        }
+        a.x = Math.min(W - 40, Math.max(16, a.x! + fx));
+        a.y = Math.min(H - 70, Math.max(16, a.y! + fy));
+      }
+    }
+    return T;
+  }
+
+  function drawMap() {
+    const W = map.clientWidth, H = map.clientHeight;
+    const T = settle(W, H);
+    lines.innerHTML = '';
+    for (const t of topics) {
+      t.el!.style.left = `${T[t.id].x}px`;
+      t.el!.style.top = `${T[t.id].y}px`;
+    }
+    entries.forEach((e, i) => {
+      e.el!.style.left = `${e.x}px`;
+      e.el!.style.top = `${e.y}px`;
+      e.topics.forEach((id, k) => {
+        const t = T[id], dx = t.x - e.x!, dy = t.y - e.y!, d = Math.hypot(dx, dy);
+        // stop short of the dot and of the word
+        const s = 8 / d, f = 1 - 22 / d;
+        for (const p of rule(lines, e.x! + dx * s, e.y! + dy * s, e.x! + dx * f, e.y! + dy * f, 100 + i * 10 + k, 0.8, 0.32)) {
+          p.dataset.e = e.n;
+          p.dataset.t = id;
+          p.dataset.op = p.getAttribute('opacity')!;
+        }
+      });
+    });
+  }
+
+  function light(test: ((n: string, t: string) => boolean) | null) {
+    map.classList.toggle('hot', !!test);
+    lines.querySelectorAll<SVGPathElement>('path').forEach((p) => {
+      const op = Number(p.dataset.op);
+      const on = !!test && test(p.dataset.e!, p.dataset.t!);
+      p.setAttribute('opacity', String(on ? Math.min(1, op * 2.8) : test ? op * 0.5 : op));
+    });
+  }
+  function rows(hot: boolean) {
+    document.querySelectorAll('.rows').forEach((r) => r.classList.toggle('hot', hot));
+  }
+  const rest = () => '<span class="note" style="font-size:16px">Hover a point, or a question, to see what connects.</span>';
+
+  function focusEntry(e: Entry | null) {
+    for (const x of entries) {
+      x.el!.classList.toggle('on', x === e);
+      x.row!.classList.toggle('on', x === e);
+    }
+    for (const t of topics) t.el!.classList.toggle('on', !!e && e.topics.includes(t.id));
+    rows(!!e);
+    light(e ? (n) => n === e.n : null);
+    cap.innerHTML = e
+      ? `<span class="mono" style="color:var(--ink-soft)">${e.n} · ${e.venue}</span><span class="t">${e.title}</span>`
+      : rest();
+  }
+  function focusTopic(t: Topic | null) {
+    for (const x of topics) x.el!.classList.toggle('on', x === t);
+    for (const e of entries) {
+      const on = !!t && e.topics.includes(t.id);
+      e.el!.classList.toggle('on', on);
+      e.row!.classList.toggle('on', on);
+    }
+    rows(!!t);
+    light(t ? (_, id) => id === t.id : null);
+    const n = t ? entries.filter((e) => e.topics.includes(t.id)).length : 0;
+    cap.innerHTML = t ? `<span class="note" style="font-size:16px">${n} ${n === 1 ? 'piece touches' : 'pieces touch'} ${t.name}</span>` : rest();
+  }
+
+  for (const e of entries) {
+    for (const ev of ['mouseenter', 'focus'] as const) e.el!.addEventListener(ev, () => focusEntry(e));
+    for (const ev of ['mouseleave', 'blur'] as const) e.el!.addEventListener(ev, () => focusEntry(null));
+    e.el!.addEventListener('click', () => e.row!.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+    e.row!.addEventListener('mouseenter', () => focusEntry(e));
+    e.row!.addEventListener('mouseleave', () => focusEntry(null));
+  }
+  for (const t of topics) {
+    for (const ev of ['mouseenter', 'focus'] as const) t.el!.addEventListener(ev, () => focusTopic(t));
+    for (const ev of ['mouseleave', 'blur'] as const) t.el!.addEventListener(ev, () => focusTopic(null));
+  }
+
+  onLayout(() => {
+    drawMap();
+    focusEntry(null);
+    document.querySelectorAll<SVGSVGElement>('svg.rule').forEach((s, k) => {
+      s.innerHTML = '';
+      rule(s, 0, 0, s.getBoundingClientRect().width, 0, 400 + k, 0.8, 0.45);
+    });
+  });
+</script>

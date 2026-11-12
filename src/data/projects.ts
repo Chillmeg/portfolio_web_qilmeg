@@ -24,9 +24,23 @@ export interface Project {
   title: string;
   /** Which lens(es) this project shows up under. */
   lens: Lens[];
+  /** Small label above the title on the work page, e.g. "VR world · thesis". */
+  type: string;
+  /** Shorter title for the landing map, where long ones would collide. */
+  short: string;
+  /**
+   * Where the project sits on the landing map.
+   * x: −1 engineering … +1 designing.  y: −1 system … +1 experience.
+   */
+  map: { x: number; y: number };
+  /**
+   * Short silent loop that plays behind the map on hover, e.g. "/video/yertonts.mp4"
+   * in public/video/. Without one, the thumbnail shows instead.
+   */
+  video?: string;
   /** Folder under assets_web/ holding this project's images. */
   assets?: string;
-  /** Filename in assets_web/thumbnail/ */
+  /** Filename in src/assets/thumbnail/. Without one, the first gallery image stands in. */
   thumb?: string;
   /** Credit block above the description. */
   meta?: MetaLine[];
@@ -64,6 +78,9 @@ export const projects: Project[] = [
     slug: 'nasa-suits-gain-ai',
     title: 'GAIN AI',
     lens: ['developer'],
+    type: 'AI assistant · AR interface',
+    short: 'GAIN AI · NASA SUITS',
+    map: { x: -0.62, y: 0.18 },
     assets: 'NASA_suits',
     thumb: 'nasa.png',
     meta: [
@@ -84,6 +101,9 @@ export const projects: Project[] = [
     slug: 'multimodal-scene-representation-learning',
     title: 'Multimodal Scene Representation Learning for Spatial and Temporal Understanding in Video',
     lens: ['developer'],
+    type: 'Machine learning · video',
+    short: 'Multimodal Scene Learning',
+    map: { x: -0.84, y: -0.72 },
     meta: [{ text: 'Deniz Erus, Yijiang Liu, Qilmeg Doudatcz' }],
     links: [
       { label: 'project site', href: 'https://chillmeg.github.io/25FA_MIT_67960_DL/' },
@@ -93,6 +113,9 @@ export const projects: Project[] = [
     slug: 'gaussian-splatting-selection',
     title: 'Gaussian Splatting Projects Selection',
     lens: ['developer'],
+    type: '3D reconstruction',
+    short: 'Gaussian Splatting',
+    map: { x: -0.48, y: -0.42 },
     thumb: '3dgs.png',
     meta: [
       { text: 'MIT 4.566 Advanced Digital Media' },
@@ -128,6 +151,9 @@ export const projects: Project[] = [
     slug: 're-membering',
     title: 'Re-Membering',
     lens: ['designer', 'developer'],
+    type: 'XR experience',
+    short: 'Re-Membering',
+    map: { x: 0.32, y: 0.66 },
     thumb: 'remembering.png',
     meta: [
       { text: 'MIT 6.9020 How to Make Almost Anything' },
@@ -155,6 +181,9 @@ export const projects: Project[] = [
     slug: 'playback-xr',
     title: 'PlaybackXR',
     lens: ['developer'],
+    type: 'WebXR tool',
+    short: 'PlaybackXR',
+    map: { x: -0.4, y: 0.56 },
     thumb: 'weblab.png',
     meta: [
       { text: 'MIT 6.9620 WebLab' },
@@ -182,6 +211,9 @@ export const projects: Project[] = [
     slug: 'yertonts',
     title: 'Yertönts, the Vertical World',
     lens: ['designer'],
+    type: 'VR world · thesis',
+    short: 'Yertönts, the Vertical World',
+    map: { x: 0.7, y: 0.8 },
     assets: 'vertical_world',
     thumb: 'vertical.png',
     meta: [
@@ -224,6 +256,9 @@ export const projects: Project[] = [
     slug: 'carespace-xr',
     title: 'CareSpace XR',
     lens: ['developer', 'designer'],
+    type: 'XR · care environments',
+    short: 'CareSpace XR',
+    map: { x: -0.24, y: 0.36 },
     assets: 'carespace_xr',
     thumb: 'carespaceXR.png',
     meta: [
@@ -268,6 +303,9 @@ export const projects: Project[] = [
     slug: 'empathy-in-point-clouds',
     title: 'Empathy In Point Clouds',
     lens: ['developer', 'designer'],
+    type: 'Point clouds · research group',
+    short: 'Empathy in Point Clouds',
+    map: { x: 0.34, y: 0.28 },
     thumb: 'EIPC.png',
     meta: [
       { text: 'Visualization work selection done in an academic research group' },
@@ -310,6 +348,9 @@ export const projects: Project[] = [
     slug: 'stool-series',
     title: 'The Stool Series',
     lens: ['designer'],
+    type: 'Digital fabrication',
+    short: 'The Stool Series',
+    map: { x: 0.52, y: -0.36 },
     assets: 'stool_series',
     thumb: 'chair.jpg',
     meta: [
@@ -336,6 +377,9 @@ export const projects: Project[] = [
     slug: 'more-room-at-the-table',
     title: 'More Room at The Table',
     lens: ['designer', 'developer'],
+    type: 'XR · research',
+    short: 'More Room at the Table',
+    map: { x: 0.6, y: 0.46 },
     assets: 'mrat',
     thumb: 'mrat.jpg',
     meta: [
@@ -381,6 +425,9 @@ export const projects: Project[] = [
     slug: 'simulated-assemblies',
     title: 'Simulated Assemblies Lab',
     lens: ['developer', 'designer'],
+    type: 'Game prototyping · lab',
+    short: 'Simulated Assemblies Lab',
+    map: { x: 0.36, y: -0.12 },
     thumb: 'Minga_4.png',
     meta: [
       { text: 'Research practice led by Professor Jose Sanchez' },
@@ -398,6 +445,9 @@ export const projects: Project[] = [
     slug: 'graphic-statics',
     title: 'The Compression Only Slab Based on 3D Graphic Statics',
     lens: ['developer', 'designer'],
+    type: 'Structural form-finding',
+    short: 'Compression-Only Slab',
+    map: { x: -0.74, y: -0.32 },
     assets: 'graphic_statics',
     thumb: 'graphic.png',
     meta: [
@@ -427,6 +477,9 @@ export const projects: Project[] = [
     slug: 'multi-stable-metamaterial',
     title: 'Metamaterial Based on Multi-stable Origami Structure',
     lens: ['developer', 'designer'],
+    type: 'Computational material',
+    short: 'Multi-stable Metamaterial',
+    map: { x: -0.5, y: -0.82 },
     assets: 'metamaterial',
     thumb: 'metamaterial.png',
     meta: [
@@ -455,6 +508,9 @@ export const projects: Project[] = [
     slug: 'rural-bridge-house',
     title: 'The Rural Bridge House',
     lens: ['designer'],
+    type: 'Architecture',
+    short: 'The Rural Bridge House',
+    map: { x: 0.8, y: -0.14 },
     assets: 'rural_bridge_house',
     thumb: 'rural.png',
     meta: [
@@ -491,6 +547,9 @@ export const projects: Project[] = [
     slug: 'us-embassy-london',
     title: 'US Embassy London Facade Study',
     lens: ['designer'],
+    type: 'Facade study · model',
+    short: 'US Embassy Facade',
+    map: { x: -0.2, y: -0.62 },
     assets: 'wood_workin',
     thumb: 'wood.png',
     meta: [
@@ -526,6 +585,9 @@ export const projects: Project[] = [
     slug: 'robotic-arm-3d-printing',
     title: 'Vases by KUKA',
     lens: ['designer', 'developer'],
+    type: 'Robotic fabrication',
+    short: 'Vases by KUKA',
+    map: { x: -0.22, y: -0.26 },
     assets: 'kuka',
     thumb: 'vase.jpg',
     meta: [
@@ -551,6 +613,9 @@ export const projects: Project[] = [
     slug: 'glass-pavilion',
     title: 'The Crystal Pavilion of Glass Lifecycle',
     lens: ['designer'],
+    type: 'Architecture',
+    short: 'Crystal Pavilion',
+    map: { x: 0.36, y: -0.68 },
     archived: true,
     thumb: 'glass-pavillion.png',
     meta: [
@@ -582,6 +647,9 @@ export const projects: Project[] = [
     slug: 'micro-sheep',
     title: 'Fibonacci — Micro Sheep on Kitchen Floor',
     lens: ['designer'],
+    type: 'Spatial study',
+    short: 'Micro Sheep',
+    map: { x: 0.78, y: -0.58 },
     archived: true,
     thumb: 'sheep.png',
     meta: [
@@ -613,6 +681,9 @@ export const projects: Project[] = [
     slug: 'ordos-reverie',
     title: 'Ordos Reverie',
     lens: ['designer'],
+    type: 'Photography',
+    short: 'Ordos Reverie',
+    map: { x: 0.86, y: 0.3 },
     archived: true,
     meta: [{ text: 'Photography' }],
     body: [

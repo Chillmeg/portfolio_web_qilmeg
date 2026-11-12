@@ -4,7 +4,9 @@ Personal portfolio site. Read this before making architectural suggestions.
 
 ## Where things stand
 
-- **Repo:** this one. Currently a single hand-written `index.html`, nothing else.
+- **Repo:** this one. An Astro site with static output (`output: 'static'`, no adapter).
+  Pages: `/` (landing map), `/work/` and `/work/<slug>/`, `/research/`, `/about/` (the CV).
+  Old Cargo URLs redirect via `astro.config.mjs`.
 - **Domain:** qilmegd.com. Mid-transfer from Cargo to Porkbun, completes ~24 Aug 2026.
   DNS is not yet pointed anywhere new — that's the last step, deliberately.
 - **Hosting:** Vercel, deploying from this repo. Not yet connected to the custom domain;
@@ -14,7 +16,7 @@ Personal portfolio site. Read this before making architectural suggestions.
 
 ## Decisions already made
 
-**Astro** is the intended framework, if/when the site outgrows plain HTML. Chosen
+**Astro** is the framework (adopted). Chosen
 specifically for its adapter model: `@astrojs/node` and `@astrojs/vercel` mean the
 deploy target can change without a rewrite. Don't suggest Next.js — it was considered
 and passed over for being more Vercel-shaped.
@@ -41,13 +43,28 @@ managed platforms indefinitely. Vercel is a convenience, not a commitment. Concr
 - Node is wanted as a **build tool** (bundling, static generation). A running backend
   server is a maybe, not a plan.
 
-## Immediate tasks
+## Design system (Nov 2026 redesign)
 
-1. Get the current `index.html` deploying cleanly on Vercel.
-2. Decide whether to stay hand-written or scaffold Astro. Hand-written HTML/CSS is an
-   acceptable permanent answer for a small portfolio — don't add tooling by default.
-3. Build out the actual portfolio content.
-4. Only then: connect the custom domain.
+- **Look:** warm paper `#F9F8F5`, soft ink `#232120`, no texture. Content clusters toward
+  the centre; header and corner furniture stay at the edges.
+- **Type:** Poppins (name, titles, nav) · IBM Plex Mono (data: labels, dates, coordinates)
+  · EB Garamond italic (margin notes). All self-hosted via `@fontsource`.
+- **Lines:** every hand-drawn line comes from `src/scripts/ink.ts` (seeded wobble, drawn
+  twice). Don't hand-write SVG paths in pages. `[data-marks]`, `[data-underline]` and
+  `[data-ring]` are drawn automatically by `Base.astro`.
+- **Landing map:** x = engineering ↔ designing, y = system ↔ experience. Each project's
+  position, short label and type live in `projects.ts` (`map`, `short`, `type`).
+  Optional `video` (in `public/video/`) plays on hover; otherwise the thumbnail shows.
+- **Images are never cropped** on work figures and project pages.
+- **Data, not markup:** projects in `src/data/projects.ts`, papers/writing and research
+  topics in `src/data/research.ts`, CV in `src/data/cv.ts`.
+
+## Next
+
+1. Pair a short silent loop with each featured project (`video` in `projects.ts`).
+2. Blog: posts will live in `src/content/blog/`, reached from Obsidian through a junction
+   from the vault's `07_Blog` folder. Never read the rest of the vault.
+3. Connect the custom domain (see below).
 
 ## DNS — do not guess values
 

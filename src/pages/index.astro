@@ -1,58 +1,446 @@
 ---
 import Base from '../layouts/Base.astro';
+import { projects } from '../data/projects';
+import { cover } from '../lib/covers';
 
-/* Cargo's landing page: a looping YouTube video as the page backdrop, inset by
-   an 8rem margin and cover-cropped to fill it. Muted autoplay needs mute=1 as
-   well as autoplay=1, and YouTube only loops with an explicit playlist. */
-const id = 'n9dc7y0t1SQ';
-const params = new URLSearchParams({
-  autoplay: '1',
-  mute: '1',
-  loop: '1',
-  playlist: id,
-  controls: '0',
-  rel: '0',
-  playsinline: '1',
-  modestbranding: '1',
-});
-const src = `https://www.youtube-nocookie.com/embed/${id}?${params}`;
+/* The landing page is a hand-ruled map of the work.
+   x: engineering ↔ designing (how I approached it)
+   y: system ↔ experience (what it became)
+   Each project's place comes from `map` in projects.ts. */
+const points = await Promise.all(
+  projects.map(async (p) => ({
+    slug: p.slug,
+    title: p.short,
+    type: p.type,
+    x: p.map.x,
+    y: p.map.y,
+    video: p.video ?? null,
+    still: await cover(p, 1600),
+  })),
+);
 ---
 
-<Base title="Qilmeg Doudatcz">
-  <div class="backdrop" aria-hidden="true">
-    <iframe
-      src={src}
-      title="Portfolio reel"
-      tabindex="-1"
-      allow="autoplay; encrypted-media; picture-in-picture"
-      referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<Base title="Qilmeg Doudatcz" home bodyClass="landing">
+  <div class="stage" id="stage">
+    <div class="media" id="media" aria-hidden="true"><div></div><div></div></div>
+    <div class="veil"></div>
+
+    <div class="ink-layer">
+      <svg class="ink bleed" id="lines" aria-hidden="true"></svg>
+      <div class="box" id="b-top">Experience</div>
+      <div class="box" id="b-bottom">System</div>
+      <div class="box" id="b-left">Engineering</div>
+      <div class="box" id="b-right">Designing</div>
+      <h1 class="name" id="name">Qilmeg Doudatcz</h1>
+      <div class="note axis-note" id="n-h">how I approached it</div>
+      <div class="note axis-note" id="n-v">what it became</div>
+      <div id="points">
+        {
+          points.map((p) => (
+            <a class="pt" href={`/work/${p.slug}/`} data-slug={p.slug}>
+              <span class="dot" />
+              <span class="label">{p.title}</span>
+              <span class="open note">open project →</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <p class="hint note" id="hint">move toward a point</p>
   </div>
+
+  <script type="application/json" id="map-data" set:html={JSON.stringify(points)} />
 </Base>
 
-<style>
-  .backdrop {
-    position: fixed;
-    inset: 8rem;
+<style is:global>
+  body.landing {
     overflow: hidden;
-    background: #000;
-    container-type: size;
+    height: 100%;
+  }
+</style>
+
+<style>
+  /* Stack: media behind → veil (the page) → ink on top. */
+  .stage {
+    position: fixed;
+    inset: 0;
   }
 
-  /* object-fit: cover, for an iframe: whichever of width/height overflows. */
-  iframe {
+  .media {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: max(100cqw, 100cqh * 16 / 9);
-    height: max(100cqh, 100cqw * 9 / 16);
-    transform: translate(-50%, -50%);
-    border: 0;
-    pointer-events: none;
+    inset: 0;
+    overflow: hidden;
+    background: var(--paper-deep);
   }
 
+  .media :global(div) {
+    position: absolute;
+    inset: -4%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    filter: saturate(0.85);
+    animation: drift 16s ease-in-out infinite alternate;
+  }
+
+  .media :global(div.on) {
+    opacity: 1;
+  }
+
+  .media :global(video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @keyframes drift {
+    from {
+      transform: scale(1.02) translate(-1%, 0.5%);
+    }
+    to {
+      transform: scale(1.09) translate(1.2%, -1%);
+    }
+  }
+
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    transition: opacity 0.9s ease;
+  }
+
+  .stage.live .veil {
+    opacity: 0.42;
+  }
+
+  .ink-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .box,
+  .name {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    padding: 6px 10px;
+  }
+
+  .name {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    padding: 0;
+  }
+
+  .box,
+  .name,
+  .axis-note {
+    filter: url(#bleed);
+  }
+
+  .axis-note {
+    position: absolute;
+    font-size: 17px;
+    white-space: nowrap;
+    transform-origin: 0 0;
+  }
+
+  .pt {
+    position: absolute;
+    transform: translate(-50%, -6px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 6px;
+    text-decoration: none;
+    text-align: center;
+    transition: opacity 0.5s ease;
+  }
+
+  .pt .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    transition:
+      background 0.3s,
+      transform 0.3s;
+  }
+
+  .pt .label {
+    max-width: 15em;
+    font-size: 10.5px;
+    font-weight: 300;
+    line-height: 1.35;
+    text-transform: uppercase;
+    letter-spacing: calc(0.08em + var(--f, 0) * 0.14em);
+    transition: letter-spacing 0.15s linear;
+  }
+
+  .pt .open {
+    height: 0;
+    overflow: visible;
+    font-size: 15px;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .stage.live .pt {
+    opacity: 0.32;
+  }
+
+  .stage.live .pt.near {
+    opacity: 0.7;
+  }
+
+  .stage.live .pt.on {
+    opacity: 1;
+  }
+
+  .pt.on .dot {
+    background: var(--ink);
+    transform: scale(1.5);
+  }
+
+  .pt.on .label {
+    font-weight: 500;
+  }
+
+  .pt.on .open {
+    opacity: 1;
+  }
+
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    margin: 0;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  /* Phones: points only; a tap names one, a second tap opens it. */
   @media (max-width: 760px) {
-    .backdrop {
-      inset: 8rem var(--pad) var(--pad);
+    .pt .label {
+      display: none;
+    }
+
+    .pt.on .label {
+      display: block;
+      padding: 2px 4px;
+      background: var(--paper);
+    }
+
+    .box {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 4px 6px;
+    }
+
+    .name {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+    }
+
+    .axis-note {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .media :global(div) {
+      animation: none;
     }
   }
 </style>
+
+<script>
+  import { rule, arrow, loop, box, data, onLayout } from '../scripts/ink';
+
+  type Point = {
+    slug: string;
+    title: string;
+    type: string;
+    x: number;
+    y: number;
+    video: string | null;
+    still: { src: string; w: number; h: number } | null;
+    el?: HTMLAnchorElement;
+    px?: number;
+    py?: number;
+  };
+
+  const $ = (id: string) => document.getElementById(id)!;
+  const stage = $('stage');
+  const lines = $('lines') as unknown as SVGSVGElement;
+  const slots = [...$('media').children] as HTMLDivElement[];
+  const hint = $('hint');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = matchMedia('(pointer: coarse)').matches;
+
+  const points = data<Point[]>('map-data');
+  for (const p of points) p.el = document.querySelector<HTMLAnchorElement>(`.pt[data-slug="${p.slug}"]`)!;
+
+  let geo: { cx: number; cy: number } | null = null;
+
+  function layout() {
+    const W = innerWidth, H = innerHeight, phone = W < 760;
+    lines.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    lines.innerHTML = '';
+    const cx = W / 2, cy = H / 2;
+    // the map keeps to the middle of wide screens instead of running to the edges
+    const mx = phone ? 54 : Math.max(110, W * 0.09, cx - 600);
+    const my = phone ? 78 : Math.max(70, H * 0.09, cy - 390);
+    const place = (el: HTMLElement, x: number, y: number) => {
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+    };
+    place($('b-top'), cx, my);
+    place($('b-bottom'), cx, H - my);
+    place($('name'), cx, cy);
+    // phones are too narrow for boxes at the ends of the horizontal axis, so
+    // those two sit just above the line, at its ends
+    const bl = $('b-left'), br = $('b-right');
+    if (phone) {
+      place(bl, 14 + bl.offsetWidth / 2, cy - 30);
+      place(br, W - 14 - br.offsetWidth / 2, cy - 30);
+    } else {
+      place(bl, mx, cy);
+      place(br, W - mx, cy);
+    }
+
+    const R = (id: string) => $(id).getBoundingClientRect();
+    const top = R('b-top'), bot = R('b-bottom'), lft = R('b-left'), rgt = R('b-right'), nm = R('name');
+    const rx = nm.width / 2 + (phone ? 16 : 26), ry = nm.height / 2 + (phone ? 12 : 16), gap = 6;
+
+    loop(lines, cx, cy, rx, ry, 11);
+    box(lines, top.left, top.top, top.right, top.bottom, 21);
+    box(lines, bot.left, bot.top, bot.right, bot.bottom, 31);
+    box(lines, lft.left, lft.top, lft.right, lft.bottom, 41);
+    box(lines, rgt.left, rgt.top, rgt.right, rgt.bottom, 51);
+
+    // axes stop short of the name's loop and of each box; arrowheads point outward
+    const up = top.bottom + gap + 3, down = bot.top - gap - 3;
+    const left = phone ? 14 : lft.right + gap + 3, right = phone ? W - 14 : rgt.left - gap - 3;
+    rule(lines, cx, cy - ry - gap, cx, up, 61);
+    arrow(lines, cx, up, -Math.PI / 2, 62);
+    rule(lines, cx, cy + ry + gap, cx, down, 71);
+    arrow(lines, cx, down, Math.PI / 2, 72);
+    rule(lines, cx - rx - gap, cy, left, cy, 81);
+    arrow(lines, left, cy, Math.PI, 82);
+    rule(lines, cx + rx + gap, cy, right, cy, 91);
+    arrow(lines, right, cy, 0, 92);
+
+    // pencilled notes along the axes
+    const nh = $('n-h'), nv = $('n-v');
+    place(nh, cx + rx + 26, cy - 26);
+    nv.style.transform = 'rotate(-90deg)';
+    place(nv, cx + 10, cy - ry - 24);
+
+    // on phones the axis runs to the screen edge, so points keep further in
+    const hx = (right - cx) * (phone ? 0.78 : 0.88), hy = (cy - up) * 0.86;
+    geo = { cx, cy };
+    for (const p of points) {
+      p.px = cx + p.x * hx;
+      p.py = cy - p.y * hy;
+      place(p.el!, p.px, p.py);
+    }
+  }
+
+  /* ---- what plays behind the page ---- */
+  let active: Point | null = null, flip = 0;
+  function show(slot: HTMLDivElement, p: Point) {
+    slot.innerHTML = '';
+    slot.style.backgroundImage = '';
+    if (p.video && !reduceMotion) {
+      const v = document.createElement('video');
+      Object.assign(v, { src: p.video, muted: true, loop: true, playsInline: true, autoplay: true });
+      slot.appendChild(v);
+      v.play().catch(() => {});
+    } else if (p.still) {
+      slot.style.backgroundImage = `url(${p.still.src})`;
+    }
+  }
+  function activate(p: Point | null) {
+    if (p === active) return;
+    active = p;
+    for (const q of points) q.el!.classList.toggle('on', q === p);
+    stage.classList.toggle('live', !!p);
+    if (p && (p.video || p.still)) {
+      flip ^= 1;
+      show(slots[flip], p);
+      slots[flip].classList.add('on');
+      slots[flip ^ 1].classList.remove('on');
+    } else {
+      slots.forEach((s) => s.classList.remove('on'));
+    }
+    hint.textContent = p ? p.type.toLowerCase() : 'move toward a point';
+  }
+
+  /* Force field: points within reach lean toward the hand and loosen their
+     letters; the nearest one inside the inner radius takes over the page. */
+  const REACH = 170, GRAB = 80;
+  let pointer: { x: number; y: number } | null = null, raf = 0;
+  function field() {
+    raf = 0;
+    if (!pointer || !geo) return;
+    let best: Point | null = null, bestD = Infinity;
+    for (const p of points) {
+      const dx = pointer.x - p.px!, dy = pointer.y - p.py!, d = Math.hypot(dx, dy) || 1;
+      const f = Math.max(0, 1 - d / REACH), e = f * f * (3 - 2 * f);
+      const pull = reduceMotion ? 0 : e * 7;
+      p.el!.style.transform = `translate(calc(-50% + ${(dx / d) * pull}px), calc(-6px + ${(dy / d) * pull}px))`;
+      p.el!.style.setProperty('--f', e.toFixed(3));
+      p.el!.classList.toggle('near', f > 0);
+      if (d < bestD) {
+        bestD = d;
+        best = p;
+      }
+    }
+    if (bestD < GRAB) activate(best);
+    else if (active && bestD > GRAB * 1.6) activate(null);
+  }
+  addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
+    pointer = { x: e.clientX, y: e.clientY };
+    if (!raf) raf = requestAnimationFrame(field);
+  });
+  document.addEventListener('pointerleave', () => {
+    pointer = null;
+    activate(null);
+    for (const p of points) {
+      p.el!.style.transform = '';
+      p.el!.style.setProperty('--f', '0');
+      p.el!.classList.remove('near');
+    }
+  });
+
+  for (const p of points) {
+    p.el!.addEventListener('focus', () => activate(p));
+    p.el!.addEventListener('blur', () => {
+      if (!pointer) activate(null);
+    });
+    // on touch screens the first tap names the project, the second opens it
+    p.el!.addEventListener('click', (e) => {
+      if (coarse && active !== p) {
+        e.preventDefault();
+        activate(p);
+      }
+    });
+  }
+  stage.addEventListener('click', (e) => {
+    if (coarse && !(e.target as Element).closest('.pt')) activate(null);
+  });
+
+  onLayout(layout);
+</script>
